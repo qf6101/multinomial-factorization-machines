@@ -18,16 +18,14 @@ class GradientDescent(private var gradient: Gradient, private var updater: Updat
 
   override def optimize(data: RDD[(Double, SparseVector[Double])],
                         initialCoeffs: Coefficients,
-                        regParam: Array[Double],
-                        negativePenalty: Double): Coefficients = {
-    val (coeffs, _) = optimizeWithHistory(data, initialCoeffs, regParam, negativePenalty)
+                        regParam: Array[Double]): Coefficients = {
+    val (coeffs, _) = optimizeWithHistory(data, initialCoeffs, regParam)
     coeffs
   }
 
   def optimizeWithHistory(data: RDD[(Double, SparseVector[Double])],
                           initialCoeffs: Coefficients,
-                          regParam: Array[Double],
-                          negativePenalty: Double = 1.0): (Coefficients, Array[Double]) = {
+                          regParam: Array[Double]): (Coefficients, Array[Double]) = {
     //获取参数
     val numIterationsValue = paramPool(numIterations)
     val miniBatchFractionValue = paramPool(miniBatchFraction)
@@ -47,7 +45,7 @@ class GradientDescent(private var gradient: Gradient, private var updater: Updat
         .treeAggregate(initialCoeffs.copyEmpty(), 0.0, 0L)(
           seqOp = (c, v) => {
             // c: (grad, loss, count), v: (label, features)
-            val l = gradient.compute(v._2, v._1, bcCoeffs.value, c._1, negativePenalty)
+            val l = gradient.compute(v._2, v._1, bcCoeffs.value, c._1)
             (c._1, c._2 + l, c._3 + 1)
           },
           combOp = (c1, c2) => {

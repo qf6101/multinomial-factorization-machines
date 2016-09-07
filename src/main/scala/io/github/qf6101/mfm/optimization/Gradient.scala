@@ -19,10 +19,9 @@ trait Gradient extends Serializable {
     */
   def compute(data: SparseVector[Double],
               label: Double,
-              coeffs: Coefficients,
-              negativePenalty: Double): (Coefficients, Double) = {
+              coeffs: Coefficients): (Coefficients, Double) = {
     val gradient = coeffs.copyEmpty()
-    val loss = compute(data, label, coeffs, gradient, negativePenalty)
+    val loss = compute(data, label, coeffs, gradient)
     (gradient, loss)
   }
 
@@ -40,6 +39,5 @@ trait Gradient extends Serializable {
   def compute(data: SparseVector[Double],
               label: Double,
               coeffs: Coefficients,
-              cumGradient: Coefficients,
-              negativePenalty: Double): Double
+              cumGradient: Coefficients): Double
 }

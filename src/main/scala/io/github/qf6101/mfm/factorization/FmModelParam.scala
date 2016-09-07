@@ -11,7 +11,7 @@ import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
   * Factorization Machine模型参数
   */
 trait FmModelParam extends ModelParam {
-  val numAttrs: Param[Int] = new Param("FmModelParam", "numAttrs", "样本维度数", ParamValidators.gt(0))
+  val numFeatures: Param[Int] = new Param("FmModelParam", "numFeatures", "样本维度数", ParamValidators.gt(0))
   val numFactors: Param[Int] = new Param("FmModelParam", "numFactors", "2阶分解维度数", ParamValidators.gt(0))
   val k0: Param[Boolean] = new Param("FmModelParam", "k0", "是否考虑0阶", ParamValidators.inArray(Array(true, false)))
   val k1: Param[Boolean] = new Param("FmModelParam", "k1", "是否考虑1阶", ParamValidators.inArray(Array(true, false)))
@@ -19,7 +19,7 @@ trait FmModelParam extends ModelParam {
   val reg0: Param[Double] = new Param("FmModelParam", "reg0", "正则参数")
   val reg1: Param[Double] = new Param("FmModelParam", "reg1", "正则参数")
   val reg2: Param[Double] = new Param("FmModelParam", "reg2", "正则参数")
-  val maxInteractAttr: Param[Int] = new Param("FmModelParam", "maxInteractAttr", "参与2阶项的最大特征维度（不包含）", ParamValidators.gt(0))
+  val maxInteractFeatures: Param[Int] = new Param("FmModelParam", "maxInteractFeatures", "参与2阶项的最大特征维度（不包含）", ParamValidators.gt(0))
 
   /**
     * 将模型参数值转成字符串形式
@@ -37,8 +37,8 @@ trait FmModelParam extends ModelParam {
     sb ++= paramPool(reg1).toString
     sb ++= " reg2:"
     sb ++= paramPool(reg2).toString
-    sb ++= " numAttrs:"
-    sb ++= paramPool(numAttrs).toString
+    sb ++= " numFeatures:"
+    sb ++= paramPool(numFeatures).toString
     sb ++= " numFactors:"
     sb ++= paramPool(numFactors).toString
     sb ++= " k0:"
@@ -51,8 +51,8 @@ trait FmModelParam extends ModelParam {
     sb ++= paramPool(initMean).toString
     sb ++= " initStdev:"
     sb ++= paramPool(initStdev).toString
-    sb ++= " maxInteractAttr:"
-    sb ++= paramPool(maxInteractAttr).toString
+    sb ++= " maxInteractFeatures:"
+    sb ++= paramPool(maxInteractFeatures).toString
     sb.toString()
   }
 }
@@ -84,14 +84,14 @@ object FmModelParam {
     paramPool.put(fmModelParam.reg0, reg0)
     paramPool.put(fmModelParam.reg1, reg1)
     paramPool.put(fmModelParam.reg2, reg2)
-    paramPool.put(fmModelParam.numAttrs, numAttrs)
+    paramPool.put(fmModelParam.numFeatures, numAttrs)
     paramPool.put(fmModelParam.numFactors, numFactors)
     paramPool.put(fmModelParam.k0, k0)
     paramPool.put(fmModelParam.k1, k1)
     paramPool.put(fmModelParam.k2, k2)
     paramPool.put(fmModelParam.initMean, initMean)
     paramPool.put(fmModelParam.initStdev, initStdev)
-    paramPool.put(fmModelParam.maxInteractAttr, maxInteractAttr)
+    paramPool.put(fmModelParam.maxInteractFeatures, maxInteractAttr)
     fmModelParam
   }
 }

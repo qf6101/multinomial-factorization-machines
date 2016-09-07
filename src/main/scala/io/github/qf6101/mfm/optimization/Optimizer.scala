@@ -10,6 +10,5 @@ import org.apache.spark.rdd.RDD
 trait Optimizer extends Serializable {
   def optimize(data: RDD[(Double, SparseVector[Double])],
                initialCoeffs: Coefficients,
-               regParam: Array[Double],
-               negativePenalty: Double): Coefficients
+               regParam: Array[Double]): Coefficients
 }

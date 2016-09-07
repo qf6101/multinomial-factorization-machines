@@ -15,14 +15,12 @@ import org.apache.spark.storage.StorageLevel
   * 逻辑斯蒂模型的LBFGS学习器
   * @param paramPool 参数池*
   * @param updater 参数更新器
-  * @param imbalanceThreshold 不平衡阈值
   * @param initialCoeffs 初始参数
   */
 class LrLearnLBFGS(override val paramPool: ParamMap,
                    val updater: Updater,
-                   override val imbalanceThreshold: Double = 0.0,
                    val initialCoeffs: Option[VectorCoefficients] = None)
-  extends MLLearner(paramPool, imbalanceThreshold) with LrModelParam {
+  extends MLLearner(paramPool) with LrModelParam {
   val lg = new LogisticGradient(paramPool)
   val lbfgs = new LBFGS(lg, updater, paramPool)
 
@@ -37,7 +35,7 @@ class LrLearnLBFGS(override val paramPool: ParamMap,
       case Some(value) => value
       case None => new VectorCoefficients(dataSet.first()._2.length)
     }
-    val coeffs = lbfgs.optimize(dataSet, inputCoeffs, paramPool(reg), calcNegativePenalty(dataSet))
+    val coeffs = lbfgs.optimize(dataSet, inputCoeffs, paramPool(reg))
     dataSet.unpersist()
     new LrModel(coeffs.asInstanceOf[VectorCoefficients], this, paramPool)
   }
@@ -54,15 +52,13 @@ object LrLearnLBFGS {
     * @param dataset 数据集
     * @param paramPool 参数池*
     * @param updater 参数更新器
-    * @param imbalanceThreshold 不平衡阈值
     * @param initialCoeffs 初始参数
     * @return 逻辑斯蒂模型
     */
   def train(dataset: RDD[(Double, SparseVector[Double])],
             paramPool: ParamMap,
             updater: Updater,
-            imbalanceThreshold: Double = 0.0,
             initialCoeffs: Option[VectorCoefficients] = None): MLModel = {
-    new LrLearnLBFGS(paramPool, updater, imbalanceThreshold, initialCoeffs).train(dataset)
+    new LrLearnLBFGS(paramPool, updater, initialCoeffs).train(dataset)
   }
 }

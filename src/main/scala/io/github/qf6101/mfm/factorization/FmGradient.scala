@@ -18,14 +18,12 @@ class FmGradient(paramHolder: FmModelParam, paramPool: ParamMap) extends Gradien
     * @param label label for this data point
     * @param coeffs weights/coefficients corresponding to features
     * @param cumGradient the computed gradient will be added to this vector
-    * @param negativePenalty 不平衡数据中负样本的惩罚比例
     * @return loss
     */
   override def compute(data: SparseVector[Double],
                        label: Double,
                        coeffs: Coefficients,
-                       cumGradient: Coefficients,
-                       negativePenalty: Double):
+                       cumGradient: Coefficients):
   Double = {
     val fmcoeffs = coeffs.asInstanceOf[FmCoefficients]
     val fmCumGradient = cumGradient.asInstanceOf[FmCoefficients]
@@ -34,17 +32,15 @@ class FmGradient(paramHolder: FmModelParam, paramPool: ParamMap) extends Gradien
     val loss = math.log(expComponent)
     val multiplier = -label * (1 - 1 / expComponent)
     //参与2阶项的最大维度
-    val maxInteractAttr = paramPool(paramHolder.maxInteractAttr)
+    val maxInteractAttr = paramPool(paramHolder.maxInteractFeatures)
     //0阶梯度
     if (paramPool(paramHolder.k0)) {
-      val incrementGradient = if(label > 0) multiplier else multiplier * negativePenalty
-      fmCumGradient.w0 += incrementGradient
+      fmCumGradient.w0 += multiplier
     }
     //1阶梯度
     if (paramPool(paramHolder.k1)) {
       data.activeIterator.foreach { case (index, value) =>
-        val incrementGradient = if(label > 0) multiplier * value else multiplier * value * negativePenalty
-        fmCumGradient.w(index) += incrementGradient
+        fmCumGradient.w(index) += multiplier * value
       }
     }
     //2阶梯度
@@ -62,7 +58,7 @@ class FmGradient(paramHolder: FmModelParam, paramPool: ParamMap) extends Gradien
             val twoWayCumCoeff = fmCumGradient.v(index, factorIndex)
             val twoWayCoeff = fmcoeffs.v(index, factorIndex)
             val incrementGradient = twoWayCumCoeff + multiplier * ((value * firstMoment) - (twoWayCoeff * value * value))
-            fmCumGradient.v.update(index, factorIndex, if(label > 0) incrementGradient else incrementGradient * negativePenalty)
+            fmCumGradient.v.update(index, factorIndex, incrementGradient)
           }
         }
       }

@@ -38,7 +38,7 @@ object FmModel extends Logging {
     var oneWayPredict = 0.0
     var twoWayPredict = 0.0
     //参与2阶项的最大维度
-    val maxInteractAttr = paramPool(paramHolder.maxInteractAttr)
+    val maxInteractAttr = paramPool(paramHolder.maxInteractFeatures)
     //0阶预测值
     if (paramPool(paramHolder.k0)) {
       zeroWayPredict += coeffs.w0

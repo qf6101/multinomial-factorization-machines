@@ -5,7 +5,7 @@ import org.apache.log4j.Logger
 /**
   * Created by qfeng on 16-8-30.
   */
-trait Logging {
+trait Logging extends Serializable {
   private[this] val LOGGER = Logger.getLogger(this.getClass.toString)
 
   protected def logInfo(msg: String, t: Throwable = null): Unit = {

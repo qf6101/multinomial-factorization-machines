@@ -16,9 +16,8 @@ import org.apache.spark.rdd.RDD
   * @param updater 模型参数更新器
   */
 class FmLearnSGD(override val paramPool: ParamMap,
-                 val updater: Updater,
-                 override val imbalanceThreshold: Double = 0.0)
-  extends MLLearner(paramPool, imbalanceThreshold) with FmModelParam {
+                 val updater: Updater)
+  extends MLLearner(paramPool) with FmModelParam {
   val lg = new FmGradient(this, paramPool)
   val gd = new GradientDescent(lg, updater, paramPool)
 
@@ -29,9 +28,9 @@ class FmLearnSGD(override val paramPool: ParamMap,
     */
   override def train(dataset: RDD[(Double, SparseVector[Double])]): MLModel = {
     val initialCoeffs = new FmCoefficients(paramPool(initMean), paramPool(initStdev),
-      paramPool(numAttrs), paramPool(maxInteractAttr), paramPool(numFactors), paramPool(k0), paramPool(k1), paramPool(k2))
+      paramPool(numFeatures), paramPool(maxInteractFeatures), paramPool(numFactors), paramPool(k0), paramPool(k1), paramPool(k2))
     val regs = Array(paramPool(reg0), paramPool(reg1), paramPool(reg2))
-    val coeffs = gd.optimize(dataset, initialCoeffs, regs, calcNegativePenalty(dataset))
+    val coeffs = gd.optimize(dataset, initialCoeffs, regs)
     new FmModel(coeffs.asInstanceOf[FmCoefficients], this, paramPool)
   }
 }
@@ -42,8 +41,7 @@ class FmLearnSGD(override val paramPool: ParamMap,
 object FmLearnSGD {
   def train(dataset: RDD[(Double, SparseVector[Double])],
             paramPool: ParamMap,
-            updater: Updater,
-            imbalanceThreshold: Double = 0.0): MLModel = {
+            updater: Updater): MLModel = {
     new FmLearnSGD(paramPool, updater).train(dataset)
   }
 }

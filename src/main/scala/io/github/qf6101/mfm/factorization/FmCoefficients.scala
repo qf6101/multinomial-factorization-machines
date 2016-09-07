@@ -12,7 +12,8 @@ import scala.math._
 
 /**
   * Factorization Machine模型系数
-  * @param numAttrs 属性个数
+ *
+  * @param numFeatures 特征个数
   * @param numFactors 因子个数
   * @param k0 是否需要处理截距
   * @param k1 是否需要处理一阶参数
@@ -20,18 +21,19 @@ import scala.math._
   */
 class FmCoefficients(val initMean: Double,
                      val initStdev: Double,
-                     var numAttrs: Int,
-                     var numInteractAttrs: Int,
+                     var numFeatures: Int,
+                     var numInteractFeatures: Int,
                      var numFactors: Int,
                      val k0: Boolean,
                      val k1: Boolean,
                      val k2: Boolean) extends Coefficients {
   var w0 = GaussianRandom.rand(initMean, initStdev)
-  var w = GaussianRandom.randDenseVector(initMean, initStdev, numAttrs)
-  var v = GaussianRandom.randDenseMatrix(initMean, initStdev, numInteractAttrs, numFactors)
+  var w = GaussianRandom.randDenseVector(initMean, initStdev, numFeatures)
+  var v = GaussianRandom.randDenseMatrix(initMean, initStdev, numInteractFeatures, numFactors)
 
   /**
     * 用breeze稀疏向量和CSC稀疏矩阵初始化模型系数
+ *
     * @param w0 0阶系数
     * @param w 1阶系数
     * @param v 2阶系数
@@ -48,13 +50,15 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 只复制this的结构（比如参数个数），不复制内容
+ *
     * @return 复制的拷贝
     */
   override def copyEmpty(): Coefficients = new FmCoefficients(this.initMean, this.initMean,
-    this.numAttrs, this.numInteractAttrs, this.numFactors, this.k0, this.k1, this.k2)
+    this.numFeatures, this.numInteractFeatures, this.numFactors, this.k0, this.k1, this.k2)
 
   /**
     * 对应系数加法，加至this上
+ *
     * @param other 加数
     * @return this
     */
@@ -68,6 +72,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数减法，减至this上
+ *
     * @param other 减数
     * @return this
     */
@@ -81,6 +86,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数加上同一实数，加至复制this的类上
+ *
     * @param addend 加数
     * @return 加法结果（拷贝）
     */
@@ -94,6 +100,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数乘上同一实数，加至复制this的类上
+ *
     * @param multiplier  乘数
     * @return 乘法结果
     */
@@ -107,13 +114,14 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 同时复制this的结构和内容
+ *
     * @return 复制的拷贝
     */
   override def copy: Coefficients = {
     //从效率出发，参数设为0
     val coeffs = new FmCoefficients(this.initMean, this.initStdev, 0, 0, 0, this.k0, this.k1, this.k2)
-    coeffs.numAttrs = this.numAttrs
-    coeffs.numInteractAttrs = this.numInteractAttrs
+    coeffs.numFeatures = this.numFeatures
+    coeffs.numInteractFeatures = this.numInteractFeatures
     coeffs.numFactors = this.numFactors
     coeffs.w0 = this.w0
     coeffs.w = this.w.copy
@@ -123,6 +131,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数除上同一实数，加至复制this的类上
+ *
     * @param dividend 除数
     * @return 除法结果
     */
@@ -136,6 +145,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 计算L2的正则值
+ *
     * @param reg 正则参数
     * @return 参数加权后的L2正则值
     */
@@ -148,6 +158,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 计算L2的正则梯度值
+ *
     * @param reg 正则参数
     * @return 参数加权后的L2正则梯度值
     */
@@ -206,6 +217,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 计算L1的正则值
+ *
     * @param reg 正则参数
     * @return 参数绝对值加权后的L1正则值
     */
@@ -241,6 +253,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 转成字符串描述，用于saveModel等方法
+ *
     * @return 系数的字符串描述
     */
   override def toString(): String = {

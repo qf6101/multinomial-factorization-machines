@@ -19,10 +19,9 @@ class LBFGS(private var gradient: Gradient, private var updater: Updater, privat
 Optimizer with LBFGSParam with Logging {
   override def optimize(data: RDD[(Double, SparseVector[Double])],
                         initialCoeffs: Coefficients,
-                        reg: Array[Double],
-                        negativePenalty: Double):
+                        reg: Array[Double]):
   Coefficients = {
-    val (coeffs, _) = optimizeWithHistory(data, initialCoeffs, reg, negativePenalty)
+    val (coeffs, _) = optimizeWithHistory(data, initialCoeffs, reg)
     coeffs
   }
 
@@ -111,7 +110,7 @@ Optimizer with LBFGSParam with Logging {
       val (gradientSum, lossSum) = data.treeAggregate((new VectorCoefficients(n - 1), 0.0))(
         seqOp = (c, v) => (c, v) match {
           case ((grad, loss), (label, features)) =>
-            val l = localGradient.compute(features, label, bcW.value, grad, negativePenalty)
+            val l = localGradient.compute(features, label, bcW.value, grad)
             (grad, loss + l)
         },
         combOp = (c1, c2) => (c1, c2) match {
