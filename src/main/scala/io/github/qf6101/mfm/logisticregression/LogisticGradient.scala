@@ -1,7 +1,7 @@
-package io.github.qf6101.mfm.regression
+package io.github.qf6101.mfm.logisticregression
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.base.Coefficients
+import io.github.qf6101.mfm.baseframe.Coefficients
 import io.github.qf6101.mfm.optimization.Gradient
 import org.apache.spark.ml.param.ParamMap
 

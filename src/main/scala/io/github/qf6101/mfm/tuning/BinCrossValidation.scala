@@ -1,7 +1,8 @@
 package io.github.qf6101.mfm.tuning
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.base.{MLLearner, MLModel}
+import io.github.qf6101.mfm.baseframe.binary.{BinLearner, BinModel}
+import io.github.qf6101.mfm.baseframe.{MLLearner, MLModel}
 import io.github.qf6101.mfm.util.{Logging, ParamUtil}
 import org.apache.spark.ml.param.{Param, ParamMap}
 import org.apache.spark.mllib.util.MLUtils
@@ -15,10 +16,10 @@ import scala.util.Random
   * Usage: 快速模型选择，固定其他参数，尝试某一参数的各个值，取最大AUC的参数值
   */
 
-class FastCrossValidation(val learner: MLLearner,
-                          val paramGridBuilder: FastParamGridBuilder,
-                          val numFolds: Int = 5,
-                          val baseParamMinAUC: Double = 0.0) extends Logging with Serializable {
+class BinCrossValidation(val learner: BinLearner,
+                         val paramGridBuilder: BinParamGridBuilder,
+                         val numFolds: Int = 5,
+                         val baseParamMinAUC: Double = 0.0) extends Logging with Serializable {
 
   /**
     * 分类问题的模型选择
@@ -26,7 +27,8 @@ class FastCrossValidation(val learner: MLLearner,
     * @param dataset 数据集
     * @return 训练得到的模型及其评估值
     */
-  def selectParamsForClassif(dataset: RDD[(Double, SparseVector[Double])]): (MLModel, BinaryClassificationMetrics) = {
+  def selectParamsForClassif(dataset: RDD[(Double, SparseVector[Double])]): (BinModel, BinaryClassificationMetrics)
+  = {
     //选择得到的参数集合，即返回值
     val selectedParamMap = new ParamMap
     //数据分块，用于交叉验证
@@ -37,7 +39,7 @@ class FastCrossValidation(val learner: MLLearner,
     paramGridBuilder.paramGrid.foreach { case (param, paramValues) =>
       //每个参数值都对应数组中的一个元素
       val AUCs = new Array[Double](paramValues.size)
-      val models = new Array[MLModel](paramValues.size)
+      val models = new Array[BinModel](paramValues.size)
       val candidateParamValues = new Array[Any](paramValues.size)
 
       //对于每个参数值，都基于交叉检验训练模型，计算AUC均值

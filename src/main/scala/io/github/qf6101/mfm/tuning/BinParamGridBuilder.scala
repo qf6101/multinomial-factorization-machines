@@ -11,11 +11,11 @@ import scala.util.Random
   * Usage: 快速模型选择时，参数的构建工具类
   */
 
-class FastParamGridBuilder extends Serializable {
+class BinParamGridBuilder extends Serializable {
   val paramGrid = mutable.Map.empty[Param[_], Iterable[_]]
 
-  def copy(): FastParamGridBuilder = {
-    val result = new FastParamGridBuilder
+  def copy(): BinParamGridBuilder = {
+    val result = new BinParamGridBuilder
     result.paramGrid ++= paramGrid
     result
   }

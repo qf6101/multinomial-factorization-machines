@@ -1,6 +1,6 @@
 package io.github.qf6101.mfm.optimization
 
-import io.github.qf6101.mfm.base.Coefficients
+import io.github.qf6101.mfm.baseframe.Coefficients
 import io.github.qf6101.mfm.util.Logging
 
 /**

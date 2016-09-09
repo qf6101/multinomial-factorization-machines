@@ -1,7 +1,7 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.multinomial
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.base.Coefficients
+import io.github.qf6101.mfm.baseframe.Coefficients
 import io.github.qf6101.mfm.optimization.Gradient
 import io.github.qf6101.mfm.util.Logging
 

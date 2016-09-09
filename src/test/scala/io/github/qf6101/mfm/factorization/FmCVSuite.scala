@@ -1,7 +1,8 @@
 package io.github.qf6101.mfm.factorization
 
+import io.github.qf6101.mfm.factorization.binary.FmLearnSGD
 import io.github.qf6101.mfm.optimization.SquaredL2Updater
-import io.github.qf6101.mfm.tuning.{FastCrossValidation, FastParamGridBuilder}
+import io.github.qf6101.mfm.tuning.{BinCrossValidation, BinParamGridBuilder}
 import io.github.qf6101.mfm.util.{LoadDSUtil, MLlibTestSparkContext}
 import org.apache.spark.ml.param.ParamMap
 import org.joda.time.DateTime
@@ -37,10 +38,10 @@ class FmCVSuite extends FunSuite with MLlibTestSparkContext {
     paramPool.put(fmLearn.reg0, 0.1)
     paramPool.put(fmLearn.reg2, 0.1)
 
-    val paramGrid = new FastParamGridBuilder()
+    val paramGrid = new BinParamGridBuilder()
       .addGrid(fmLearn.reg1, Array(0.1, 0.05))
 
-    val cv = new FastCrossValidation(fmLearn, paramGrid, 3)
+    val cv = new BinCrossValidation(fmLearn, paramGrid, 3)
     val (model, metrics) = cv.selectParamsForClassif(dataset)
     model.saveModel(metrics.toString, System.getProperty("user.dir") + "/../testdata/mlalgorithms/output/" + DateTime.now().toString("yyyyMMdd.HHmmss"))
   }

@@ -1,7 +1,8 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.binary
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.base.{MLLearner, MLModel}
+import io.github.qf6101.mfm.baseframe.MLModel
+import io.github.qf6101.mfm.baseframe.binary.{BinLearner, BinModel}
 import io.github.qf6101.mfm.optimization.{GradientDescent, Updater}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.rdd.RDD
@@ -12,21 +13,23 @@ import org.apache.spark.rdd.RDD
 
 /**
   * FM模型的SGD学习器
+ *
   * @param paramPool 参数池
   * @param updater 模型参数更新器
   */
 class FmLearnSGD(override val paramPool: ParamMap,
                  val updater: Updater)
-  extends MLLearner(paramPool) with FmModelParam {
+  extends BinLearner(paramPool) with FmModelParam {
   val lg = new FmGradient(this, paramPool)
   val gd = new GradientDescent(lg, updater, paramPool)
 
   /**
     * 训练模型
+ *
     * @param dataset 训练集
     * @return 模型
     */
-  override def train(dataset: RDD[(Double, SparseVector[Double])]): MLModel = {
+  override def train(dataset: RDD[(Double, SparseVector[Double])]): BinModel = {
     val initialCoeffs = new FmCoefficients(paramPool(initMean), paramPool(initStdev),
       paramPool(numFeatures), paramPool(maxInteractFeatures), paramPool(numFactors), paramPool(k0), paramPool(k1), paramPool(k2))
     val regs = Array(paramPool(reg0), paramPool(reg1), paramPool(reg2))

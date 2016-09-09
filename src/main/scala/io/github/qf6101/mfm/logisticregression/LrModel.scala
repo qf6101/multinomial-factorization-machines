@@ -1,7 +1,8 @@
-package io.github.qf6101.mfm.regression
+package io.github.qf6101.mfm.logisticregression
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.base.MLModel
+import io.github.qf6101.mfm.baseframe.MLModel
+import io.github.qf6101.mfm.baseframe.binary.BinModel
 import io.github.qf6101.mfm.util.Logging
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.param.ParamMap
@@ -12,6 +13,7 @@ import org.apache.spark.ml.param.ParamMap
 
 /**
   * 逻辑斯蒂回归模型
+ *
   * @param coeffs 模型系数
   * @param paramHolder 逻辑斯蒂参数
   * @param paramPool 参数池
@@ -19,9 +21,10 @@ import org.apache.spark.ml.param.ParamMap
 class LrModel(override val coeffs: VectorCoefficients,
               override val paramHolder: LrModelParam,
               override val paramPool: ParamMap)
-  extends MLModel(coeffs, paramHolder, paramPool) with Logging {
+  extends BinModel(coeffs, paramHolder, paramPool) with Logging {
   /**
     * 对输入数据进行预测（使用内置系数）
+ *
     * @param data 输入数据
     * @return 预测值(0~1)
     */
@@ -31,6 +34,7 @@ class LrModel(override val coeffs: VectorCoefficients,
 
   /**
     * 对输入数据进行预测
+ *
     * @param data 输入数据
     * @param coeffs 系数
     * @return 预测值(0~1)

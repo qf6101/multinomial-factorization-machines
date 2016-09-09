@@ -2,8 +2,8 @@ package io.github.qf6101.mfm.optimization
 
 import breeze.linalg.SparseVector
 import breeze.optimize.{CachedDiffFunction, DiffFunction, LBFGS => BreezeLBFGS}
-import io.github.qf6101.mfm.base.Coefficients
-import io.github.qf6101.mfm.regression.VectorCoefficients
+import io.github.qf6101.mfm.baseframe.Coefficients
+import io.github.qf6101.mfm.logisticregression.VectorCoefficients
 import io.github.qf6101.mfm.util.Logging
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.rdd.RDD

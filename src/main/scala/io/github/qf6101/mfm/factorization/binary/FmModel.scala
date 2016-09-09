@@ -1,7 +1,7 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.binary
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.base.MLModel
+import io.github.qf6101.mfm.baseframe.binary.BinModel
 import io.github.qf6101.mfm.util.Logging
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.param.ParamMap
@@ -13,15 +13,17 @@ import org.apache.spark.ml.param.ParamMap
 
 /**
   * Factorization Machine模型
+ *
   * @param paramHolder 分解机模型参数
   * @param paramPool 参数池
   */
 class FmModel(override val coeffs: FmCoefficients,
               override val paramHolder: FmModelParam,
               override val paramPool: ParamMap)
-  extends MLModel(coeffs, paramHolder, paramPool) {
+  extends BinModel(coeffs, paramHolder, paramPool) {
   /**
     * 对输入数据进行预测
+ *
     * @param data 输入数据
     * @return 预测值
     */

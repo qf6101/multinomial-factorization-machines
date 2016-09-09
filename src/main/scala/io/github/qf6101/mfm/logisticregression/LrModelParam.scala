@@ -1,6 +1,7 @@
-package io.github.qf6101.mfm.regression
+package io.github.qf6101.mfm.logisticregression
 
-import io.github.qf6101.mfm.base.ModelParam
+import io.github.qf6101.mfm.baseframe.ModelParam
+import io.github.qf6101.mfm.baseframe.binary.BinModelParam
 import org.apache.spark.ml.param.{Param, ParamMap}
 
 
@@ -11,7 +12,7 @@ import org.apache.spark.ml.param.{Param, ParamMap}
 /**
   * 逻辑斯蒂模型的参数
   */
-trait LrModelParam extends ModelParam {
+trait LrModelParam extends BinModelParam {
   val reg: Param[Array[Double]] = new Param("LrModelParam", "reg", "正则参数")
 
   /**

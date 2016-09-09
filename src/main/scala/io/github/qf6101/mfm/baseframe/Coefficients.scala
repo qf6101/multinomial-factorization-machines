@@ -1,4 +1,4 @@
-package io.github.qf6101.mfm.base
+package io.github.qf6101.mfm.baseframe
 
 /**
   * Created by qfeng on 15-3-12.

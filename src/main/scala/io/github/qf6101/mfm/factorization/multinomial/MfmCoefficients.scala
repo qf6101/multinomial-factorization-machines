@@ -1,6 +1,7 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.multinomial
 
-import io.github.qf6101.mfm.base.Coefficients
+import io.github.qf6101.mfm.baseframe.Coefficients
+import io.github.qf6101.mfm.factorization.binary.FmCoefficients
 
 /**
   * Created by qfeng on 16-9-7.
@@ -14,7 +15,8 @@ class MfmCoefficients(val initMean: Double,
                       val k1: Boolean,
                       val k2: Boolean,
                       val numClasses: Int) extends Coefficients {
-  //private val thetas =
+  private val thetas = Array.fill[FmCoefficients](numClasses)(new FmCoefficients(
+    initMean, initStdev, numFeatures, numInteractFeatures, numFactors, k0, k1, k2))
 
   /**
     * 转成字符串描述，用于saveModel等方法

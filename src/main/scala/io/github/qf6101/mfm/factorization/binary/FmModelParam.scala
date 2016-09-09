@@ -1,6 +1,6 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.binary
 
-import io.github.qf6101.mfm.base.ModelParam
+import io.github.qf6101.mfm.baseframe.binary.BinModelParam
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 
 /**
@@ -10,7 +10,7 @@ import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 /**
   * Factorization Machine模型参数
   */
-trait FmModelParam extends ModelParam {
+trait FmModelParam extends BinModelParam {
   val numFeatures: Param[Int] = new Param("FmModelParam", "numFeatures", "样本维度数", ParamValidators.gt(0))
   val numFactors: Param[Int] = new Param("FmModelParam", "numFactors", "2阶分解维度数", ParamValidators.gt(0))
   val k0: Param[Boolean] = new Param("FmModelParam", "k0", "是否考虑0阶", ParamValidators.inArray(Array(true, false)))

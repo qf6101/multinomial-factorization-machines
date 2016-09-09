@@ -1,7 +1,7 @@
 package io.github.qf6101.mfm.optimization
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.regression.{LogisticGradient, LrLearnSGD, VectorCoefficients}
+import io.github.qf6101.mfm.logisticregression.{LogisticGradient, LrLearnSGD, VectorCoefficients}
 import io.github.qf6101.mfm.util.MLlibTestSparkContext
 import io.github.qf6101.mfm.util.TestingUtils._
 import org.apache.spark.ml.param.ParamMap

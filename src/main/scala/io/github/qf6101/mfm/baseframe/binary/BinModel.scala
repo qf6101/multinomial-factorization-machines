@@ -1,12 +1,13 @@
-package io.github.qf6101.mfm.base
+package io.github.qf6101.mfm.baseframe.binary
 
 import breeze.linalg.SparseVector
+import io.github.qf6101.mfm.baseframe.{Coefficients, MLModel}
 import io.github.qf6101.mfm.tuning.BinaryClassificationMetrics
 import io.github.qf6101.mfm.util.{HDFSUtil, Logging}
+import org.apache.spark.SparkContext
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.SparkContext
 
 import scala.util.control.Breaks
 
@@ -21,9 +22,9 @@ import scala.util.control.Breaks
   * @param paramHolder 模型参赛
   * @param paramPool 参数池（保存参数的值）
   */
-abstract class MLModel(val coeffs: Coefficients,
-                       val paramHolder: ModelParam,
-                       val paramPool: ParamMap) extends Logging with Serializable {
+abstract class BinModel(override val coeffs: Coefficients,
+                        val paramHolder: BinModelParam,
+                        override val paramPool: ParamMap) extends MLModel(coeffs, paramPool) with Logging with Serializable {
   //设置默认的阈值为0.5
   paramPool.put(paramHolder.binaryThreshold, 0.5)
 

@@ -1,6 +1,6 @@
 package io.github.qf6101.mfm.optimization
 
-import io.github.qf6101.mfm.regression.{LogisticGradient, LrLearnLBFGS, VectorCoefficients}
+import io.github.qf6101.mfm.logisticregression.{LogisticGradient, LrLearnLBFGS, VectorCoefficients}
 import io.github.qf6101.mfm.util.MLlibTestSparkContext
 import io.github.qf6101.mfm.util.TestingUtils._
 import org.apache.spark.ml.param.ParamMap

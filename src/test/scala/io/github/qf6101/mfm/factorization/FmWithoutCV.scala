@@ -1,5 +1,6 @@
 package io.github.qf6101.mfm.factorization
 
+import io.github.qf6101.mfm.factorization.binary.FmLearnSGD
 import io.github.qf6101.mfm.optimization.SquaredL2Updater
 import io.github.qf6101.mfm.tuning.BinaryClassificationMetrics
 import io.github.qf6101.mfm.util.{LoadDSUtil, MLlibTestSparkContext}

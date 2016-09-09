@@ -1,4 +1,4 @@
-package io.github.qf6101.mfm.base
+package io.github.qf6101.mfm.baseframe
 
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 
@@ -10,8 +10,6 @@ import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
   * 模型参数
   */
 trait ModelParam extends Serializable {
-  //default value: 0.5
-  val binaryThreshold: Param[Double] = new Param("ModelParam", "binaryThreshold", "threshold for binary classification", ParamValidators.inRange(0, 1, false, false))
   val initMean: Param[Double] = new Param("ModelParam", "initMean", "使用高斯分布，初始化参数值，均值", ParamValidators.inRange(0, 1))
   val initStdev: Param[Double] = new Param("ModelParam", "initStdev", "使用高斯分布，初始化参数值，标准差值", ParamValidators.inRange(0, 1))
 

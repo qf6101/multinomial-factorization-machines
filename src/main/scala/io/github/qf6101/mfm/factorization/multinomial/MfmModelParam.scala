@@ -1,11 +1,13 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.multinomial
 
+import io.github.qf6101.mfm.baseframe.mutinomial.MultiModelParam
+import io.github.qf6101.mfm.factorization.binary.FmModelParam
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 
 /**
   * Created by qfeng on 16-9-7.
   */
-class MfmModelParam extends FmModelParam {
+trait MfmModelParam extends FmModelParam with MultiModelParam {
   val numClasses: Param[Int] = new Param("MfmModelParam", "numClasses", "标签数目", ParamValidators.gt(0))
 
   /**

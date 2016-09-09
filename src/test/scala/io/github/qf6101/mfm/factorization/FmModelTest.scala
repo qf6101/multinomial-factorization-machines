@@ -1,5 +1,6 @@
 package io.github.qf6101.mfm.factorization
 
+import io.github.qf6101.mfm.factorization.binary.FmModel
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**

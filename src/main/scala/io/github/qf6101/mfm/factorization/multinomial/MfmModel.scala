@@ -1,7 +1,7 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.multinomial
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.base.MLModel
+import io.github.qf6101.mfm.baseframe.mutinomial.MultiModel
 import org.apache.spark.ml.param.ParamMap
 
 /**
@@ -9,12 +9,12 @@ import org.apache.spark.ml.param.ParamMap
   */
 class MfmModel(override val coeffs: MfmCoefficients,
                override val paramHolder: MfmModelParam,
-               override val paramPool: ParamMap) extends MLModel(coeffs, paramHolder, paramPool) {
+               override val paramPool: ParamMap) extends MultiModel(coeffs, paramHolder, paramPool) {
   /**
     * 对输入数据进行预测
     *
     * @param data 输入数据
     * @return 预测值(0~1)
     */
-  override def regressionPredict(data: SparseVector[Double]): Double = ???
+  override def regressionPredict(data: SparseVector[Double]): Array[Double] = ???
 }
