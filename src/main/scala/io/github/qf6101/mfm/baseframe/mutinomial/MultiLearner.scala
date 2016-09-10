@@ -8,7 +8,7 @@ import org.apache.spark.rdd.RDD
 /**
   * Created by qfeng on 16-9-9.
   */
-abstract class MultiLearner(override val paramPool: ParamMap) extends MLLearner(paramPool) {
+abstract class MultiLearner(override val params: ParamMap) extends MLLearner(params) {
   /**
     * 训练对应模型
     * @param dataset 训练集

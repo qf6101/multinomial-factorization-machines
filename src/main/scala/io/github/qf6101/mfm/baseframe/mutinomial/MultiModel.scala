@@ -9,8 +9,8 @@ import org.apache.spark.ml.param.ParamMap
   * Created by qfeng on 16-9-9.
   */
 abstract class MultiModel(override val coeffs: Coefficients,
-                          val paramHolder: MultiModelParam,
-                          override val paramPool: ParamMap) extends MLModel(coeffs, paramPool) with Logging with Serializable {
+                          val paramMeta: MultiModelParam,
+                          override val params: ParamMap) extends MLModel(coeffs, params) with Logging with Serializable {
   /**
     * 对输入数据进行预测
     *

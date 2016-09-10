@@ -19,14 +19,14 @@ import scala.util.control.Breaks
   * 预测模型基类
   *
   * @param coeffs 模型系数
-  * @param paramHolder 模型参赛
-  * @param paramPool 参数池（保存参数的值）
+  * @param paramMeta 模型参赛
+  * @param params 参数池（保存参数的值）
   */
 abstract class BinModel(override val coeffs: Coefficients,
-                        val paramHolder: BinModelParam,
-                        override val paramPool: ParamMap) extends MLModel(coeffs, paramPool) with Logging with Serializable {
+                        val paramMeta: BinModelParam,
+                        override val params: ParamMap) extends MLModel(coeffs, params) with Logging with Serializable {
   //设置默认的阈值为0.5
-  paramPool.put(paramHolder.binaryThreshold, 0.5)
+  params.put(paramMeta.binaryThreshold, 0.5)
 
   /**
     * 对输入数据进行预测
@@ -64,7 +64,7 @@ abstract class BinModel(override val coeffs: Coefficients,
     */
   def classifPredict(data: SparseVector[Double]): Double = {
     val score = regressionPredict(data)
-    if (score > paramPool(paramHolder.binaryThreshold)) {
+    if (score > params(paramMeta.binaryThreshold)) {
       1.0
     } else {
       0.0
@@ -104,7 +104,7 @@ abstract class BinModel(override val coeffs: Coefficients,
     sb += '\n'
     //描述模型参数
     sb ++= "======== parameter segment ========\n"
-    sb ++= paramHolder.mkString(paramPool)
+    sb ++= paramMeta.mkString(params)
     //返回结果
     sb.toString()
   }
@@ -137,7 +137,7 @@ abstract class BinModel(override val coeffs: Coefficients,
       }
     }
     //设置选择得到的threshold
-    paramPool.put(paramHolder.binaryThreshold, selectedThreshold)
+    params.put(paramMeta.binaryThreshold, selectedThreshold)
     //计算最终的度量指标
     val finalMetrics = new BinaryClassificationMetrics(scoreAndLabels, selectedThreshold)
     logInfo(s"selected threshold: $selectedThreshold, metrics: ${finalMetrics.toString}}")

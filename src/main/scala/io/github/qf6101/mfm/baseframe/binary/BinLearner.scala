@@ -11,9 +11,9 @@ import org.apache.spark.rdd.RDD
 
 /**
   * 模型学习器基类
-  * @param paramPool 参数池
+  * @param params 参数池
   */
-abstract class BinLearner(override val paramPool: ParamMap) extends MLLearner(paramPool) {
+abstract class BinLearner(override val params: ParamMap) extends MLLearner(params) {
   /**
     * 训练对应模型
     * @param dataset 训练集

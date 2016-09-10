@@ -24,35 +24,35 @@ trait FmModelParam extends BinModelParam {
   /**
     * 将模型参数值转成字符串形式
     *
-    * @param paramPool 参数池
+    * @param params 参数池
     * @return 模型参数值的字符串形式
     */
-  override def mkString(paramPool: ParamMap): String = {
+  override def mkString(params: ParamMap): String = {
     val sb = new StringBuilder()
     sb ++= "binaryThreshold:"
-    sb ++= "%1.2f".format(paramPool(binaryThreshold))
+    sb ++= "%1.2f".format(params(binaryThreshold))
     sb ++= " reg0:"
-    sb ++= paramPool(reg0).toString
+    sb ++= params(reg0).toString
     sb ++= " reg1:"
-    sb ++= paramPool(reg1).toString
+    sb ++= params(reg1).toString
     sb ++= " reg2:"
-    sb ++= paramPool(reg2).toString
+    sb ++= params(reg2).toString
     sb ++= " numFeatures:"
-    sb ++= paramPool(numFeatures).toString
+    sb ++= params(numFeatures).toString
     sb ++= " numFactors:"
-    sb ++= paramPool(numFactors).toString
+    sb ++= params(numFactors).toString
     sb ++= " k0:"
-    sb ++= paramPool(k0).toString
+    sb ++= params(k0).toString
     sb ++= " k1:"
-    sb ++= paramPool(k1).toString
+    sb ++= params(k1).toString
     sb ++= " k2:"
-    sb ++= paramPool(k2).toString
+    sb ++= params(k2).toString
     sb ++= " initMean:"
-    sb ++= paramPool(initMean).toString
+    sb ++= params(initMean).toString
     sb ++= " initStdev:"
-    sb ++= paramPool(initStdev).toString
+    sb ++= params(initStdev).toString
     sb ++= " maxInteractFeatures:"
-    sb ++= paramPool(maxInteractFeatures).toString
+    sb ++= params(maxInteractFeatures).toString
     sb.toString()
   }
 }
@@ -62,10 +62,10 @@ object FmModelParam {
     * 根据字符串数组构造分解机模型参数
     *
     * @param content 字符串
-    * @param paramPool 参数池
+    * @param params 参数池
     * @return 分解机型参数
     */
-  def apply(content: String, paramPool: ParamMap): FmModelParam = {
+  def apply(content: String, params: ParamMap): FmModelParam = {
     val fmModelParam = new FmModelParam {}
     val codeArray = content.split(" ")
     val binaryThreshold = codeArray(0).split(":")(1).trim.toDouble
@@ -80,18 +80,18 @@ object FmModelParam {
     val initMean = codeArray(9).split(":")(1).trim.toDouble
     val initStdev = codeArray(10).split(":")(1).trim.toDouble
     val maxInteractAttr = codeArray(11).split(":")(1).trim.toInt
-    paramPool.put(fmModelParam.binaryThreshold, binaryThreshold)
-    paramPool.put(fmModelParam.reg0, reg0)
-    paramPool.put(fmModelParam.reg1, reg1)
-    paramPool.put(fmModelParam.reg2, reg2)
-    paramPool.put(fmModelParam.numFeatures, numAttrs)
-    paramPool.put(fmModelParam.numFactors, numFactors)
-    paramPool.put(fmModelParam.k0, k0)
-    paramPool.put(fmModelParam.k1, k1)
-    paramPool.put(fmModelParam.k2, k2)
-    paramPool.put(fmModelParam.initMean, initMean)
-    paramPool.put(fmModelParam.initStdev, initStdev)
-    paramPool.put(fmModelParam.maxInteractFeatures, maxInteractAttr)
+    params.put(fmModelParam.binaryThreshold, binaryThreshold)
+    params.put(fmModelParam.reg0, reg0)
+    params.put(fmModelParam.reg1, reg1)
+    params.put(fmModelParam.reg2, reg2)
+    params.put(fmModelParam.numFeatures, numAttrs)
+    params.put(fmModelParam.numFactors, numFactors)
+    params.put(fmModelParam.k0, k0)
+    params.put(fmModelParam.k1, k1)
+    params.put(fmModelParam.k2, k2)
+    params.put(fmModelParam.initMean, initMean)
+    params.put(fmModelParam.initStdev, initStdev)
+    params.put(fmModelParam.maxInteractFeatures, maxInteractAttr)
     fmModelParam
   }
 }

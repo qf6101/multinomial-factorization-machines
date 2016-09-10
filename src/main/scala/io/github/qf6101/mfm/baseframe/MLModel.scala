@@ -6,4 +6,4 @@ import org.apache.spark.ml.param.ParamMap
   * Created by qfeng on 16-9-8.
   */
 abstract class MLModel(val coeffs: Coefficients,
-                       val paramPool: ParamMap) extends Serializable
+                       val params: ParamMap) extends Serializable

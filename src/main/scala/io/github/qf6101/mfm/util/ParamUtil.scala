@@ -13,11 +13,11 @@ object ParamUtil {
 
   /**
     * 参数池转成字符串
-    * @param paramPool 参数池
+    * @param params 参数池
     * @return 字符串
     */
-  def paramPoolToString(paramPool: ParamMap): String = {
-    paramPool.toSeq.map { paramPair => paramPair.value match {
+  def paramPoolToString(params: ParamMap): String = {
+    params.toSeq.map { paramPair => paramPair.value match {
       case v: Array[_] => s"${paramPair.param.name}:${v.mkString(",")}"
       case _ => s"${paramPair.param.name}:${paramPair.value}"
     }

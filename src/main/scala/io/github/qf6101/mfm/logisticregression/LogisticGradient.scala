@@ -14,7 +14,7 @@ import org.apache.spark.ml.param.ParamMap
   * Compute gradient and loss for a logistic loss function, as used in binary classification.
   * See also the documentation for the precise formulation.
   */
-class LogisticGradient(paramPool: ParamMap) extends Gradient {
+class LogisticGradient(params: ParamMap) extends Gradient {
   /**
     * Compute the gradient and loss given the features of a single data point,
     * add the gradient to a provided vector to avoid creating new objects, and return loss.

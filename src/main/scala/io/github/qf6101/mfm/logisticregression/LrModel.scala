@@ -15,13 +15,13 @@ import org.apache.spark.ml.param.ParamMap
   * 逻辑斯蒂回归模型
  *
   * @param coeffs 模型系数
-  * @param paramHolder 逻辑斯蒂参数
-  * @param paramPool 参数池
+  * @param paramMeta 逻辑斯蒂参数
+  * @param params 参数池
   */
 class LrModel(override val coeffs: VectorCoefficients,
-              override val paramHolder: LrModelParam,
-              override val paramPool: ParamMap)
-  extends BinModel(coeffs, paramHolder, paramPool) with Logging {
+              override val paramMeta: LrModelParam,
+              override val params: ParamMap)
+  extends BinModel(coeffs, paramMeta, params) with Logging {
   /**
     * 对输入数据进行预测（使用内置系数）
  *
@@ -82,9 +82,9 @@ object LrModel extends Logging {
     currentLine = endLine
     val coefficients = VectorCoefficients(coefficientsLines)
     //解析模型参数(parameter segment)
-    val paramPool = new ParamMap()
-    val lrModelParam = LrModelParam(content(currentLine + 1), paramPool)
+    val params = new ParamMap()
+    val lrModelParam = LrModelParam(content(currentLine + 1), params)
     //返回结果
-    new LrModel(coefficients, lrModelParam, paramPool)
+    new LrModel(coefficients, lrModelParam, params)
   }
 }

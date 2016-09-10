@@ -13,13 +13,13 @@ trait MfmModelParam extends FmModelParam with MultiModelParam {
   /**
     * 将模型参数值转成字符串形式
     *
-    * @param paramPool 参数池
+    * @param params 参数池
     * @return 模型参数值的字符串形式
     */
-  override def mkString(paramPool: ParamMap): String = {
-    val sb = new StringBuilder(super.mkString(paramPool))
+  override def mkString(params: ParamMap): String = {
+    val sb = new StringBuilder(super.mkString(params))
     sb ++= " numClasses:"
-    sb ++= paramPool(numClasses).toString
+    sb ++= params(numClasses).toString
     sb.toString()
   }
 }
@@ -29,10 +29,10 @@ object MfmModelParam {
     * 根据字符串数组构造分解机模型参数
     *
     * @param content 字符串
-    * @param paramPool 参数池
+    * @param params 参数池
     * @return 分解机型参数
     */
-  def apply(content: String, paramPool: ParamMap): MfmModelParam = {
+  def apply(content: String, params: ParamMap): MfmModelParam = {
     val mfmModelParam = new MfmModelParam {}
     val codeArray = content.split(" ")
     val binaryThreshold = codeArray(0).split(":")(1).trim.toDouble
@@ -48,19 +48,19 @@ object MfmModelParam {
     val initStdev = codeArray(10).split(":")(1).trim.toDouble
     val maxInteractAttr = codeArray(11).split(":")(1).trim.toInt
     val numClasses = codeArray(12).split(":")(1).trim.toInt
-    paramPool.put(mfmModelParam.binaryThreshold, binaryThreshold)
-    paramPool.put(mfmModelParam.reg0, reg0)
-    paramPool.put(mfmModelParam.reg1, reg1)
-    paramPool.put(mfmModelParam.reg2, reg2)
-    paramPool.put(mfmModelParam.numFeatures, numAttrs)
-    paramPool.put(mfmModelParam.numFactors, numFactors)
-    paramPool.put(mfmModelParam.k0, k0)
-    paramPool.put(mfmModelParam.k1, k1)
-    paramPool.put(mfmModelParam.k2, k2)
-    paramPool.put(mfmModelParam.initMean, initMean)
-    paramPool.put(mfmModelParam.initStdev, initStdev)
-    paramPool.put(mfmModelParam.maxInteractFeatures, maxInteractAttr)
-    paramPool.put(mfmModelParam.numClasses, numClasses)
+    params.put(mfmModelParam.binaryThreshold, binaryThreshold)
+    params.put(mfmModelParam.reg0, reg0)
+    params.put(mfmModelParam.reg1, reg1)
+    params.put(mfmModelParam.reg2, reg2)
+    params.put(mfmModelParam.numFeatures, numAttrs)
+    params.put(mfmModelParam.numFactors, numFactors)
+    params.put(mfmModelParam.k0, k0)
+    params.put(mfmModelParam.k1, k1)
+    params.put(mfmModelParam.k2, k2)
+    params.put(mfmModelParam.initMean, initMean)
+    params.put(mfmModelParam.initStdev, initStdev)
+    params.put(mfmModelParam.maxInteractFeatures, maxInteractAttr)
+    params.put(mfmModelParam.numClasses, numClasses)
     mfmModelParam
   }
 }

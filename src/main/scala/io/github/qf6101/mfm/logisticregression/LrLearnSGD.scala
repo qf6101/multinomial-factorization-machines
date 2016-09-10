@@ -21,16 +21,16 @@ import org.apache.spark.storage.StorageLevel
 /**
   * 逻辑斯蒂模型的SGD学习器
  *
-  * @param paramPool 参数池*
+  * @param params 参数池*
   * @param updater 参数更新器
   * @param initialCoeffs 初始参数
   */
-class LrLearnSGD(override val paramPool: ParamMap,
+class LrLearnSGD(override val params: ParamMap,
                  val updater: Updater,
                  val initialCoeffs: Option[VectorCoefficients] = None)
-  extends BinLearner(paramPool) with LrModelParam {
-  val lg = new LogisticGradient(paramPool)
-  val gd = new GradientDescent(lg, updater, paramPool)
+  extends BinLearner(params) with LrModelParam {
+  val lg = new LogisticGradient(params)
+  val gd = new GradientDescent(lg, updater, params)
 
   /**
     * 训练逻辑斯蒂模型
@@ -44,9 +44,9 @@ class LrLearnSGD(override val paramPool: ParamMap,
       case Some(value) => value
       case None => new VectorCoefficients(dataSet.first()._2.length)
     }
-    val coeffs = gd.optimize(dataSet, inputCoeffs, paramPool(reg))
+    val coeffs = gd.optimize(dataSet, inputCoeffs, params(reg))
     dataSet.unpersist()
-    new LrModel(coeffs.asInstanceOf[VectorCoefficients], this, paramPool)
+    new LrModel(coeffs.asInstanceOf[VectorCoefficients], this, params)
   }
 
 
@@ -60,15 +60,15 @@ object LrLearnSGD {
     * 训练逻辑斯蒂模型
     *
     * @param dataset 数据集
-    * @param paramPool 参数池*
+    * @param params 参数池*
     * @param updater 参数更新器
     * @param initialCoeffs 初始参数
     * @return 逻辑斯蒂模型
     */
   def train(dataset: RDD[(Double, SparseVector[Double])],
-            paramPool: ParamMap,
+            params: ParamMap,
             updater: Updater,
             initialCoeffs: Option[VectorCoefficients] = None): MLModel = {
-    new LrLearnSGD(paramPool, updater, initialCoeffs).train(dataset)
+    new LrLearnSGD(params, updater, initialCoeffs).train(dataset)
   }
 }

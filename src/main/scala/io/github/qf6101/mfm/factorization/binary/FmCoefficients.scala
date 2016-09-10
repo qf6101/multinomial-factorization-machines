@@ -114,7 +114,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 同时复制this的结构和内容
- *
+    *
     * @return 复制的拷贝
     */
   override def copy: Coefficients = {

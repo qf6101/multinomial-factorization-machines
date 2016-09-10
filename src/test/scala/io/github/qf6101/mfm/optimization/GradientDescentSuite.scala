@@ -53,11 +53,11 @@ class GradientDescentSuite extends FunSuite with MLlibTestSparkContext with Matc
     val A = 2.0
     val B = -1.5
 
-    val paramPool = new ParamMap()
-    val gradient = new LogisticGradient(paramPool)
+    val params = new ParamMap()
+    val gradient = new LogisticGradient(params)
     val updater = new SimpleUpdater()
-    val lrf = new LrLearnSGD(paramPool, null)
-    val gd = new GradientDescent(gradient, updater, paramPool)
+    val lrf = new LrLearnSGD(params, null)
+    val gd = new GradientDescent(gradient, updater, params)
 
     // Add a extra variable consisting of all 1.0's for the intercept.
     val testData = GradientDescentSuite.generateGDInput(A, B, nPoints, 42)
@@ -66,16 +66,16 @@ class GradientDescentSuite extends FunSuite with MLlibTestSparkContext with Matc
     initialWeightsWithIntercept.w.update(0, 1.0)
     initialWeightsWithIntercept.w.update(1, -1.0)
 
-    paramPool.put(gd.numIterations, 10)
-    paramPool.put(gd.miniBatchFraction, 1.0)
-    paramPool.put(gd.stepSize, 1.0)
-    paramPool.put(gd.convergenceTol, 1E-4)
-    paramPool.put(lrf.reg, Array(0.0))
+    params.put(gd.numIterations, 10)
+    params.put(gd.miniBatchFraction, 1.0)
+    params.put(gd.stepSize, 1.0)
+    params.put(gd.convergenceTol, 1E-4)
+    params.put(lrf.reg, Array(0.0))
 
     val (_, loss) = gd.optimizeWithHistory(
       dataRDD,
       initialWeightsWithIntercept,
-      paramPool(lrf.reg))
+      params(lrf.reg))
 
     assert(loss.last - loss.head < 0, "loss isn't decreasing.")
 
@@ -85,11 +85,11 @@ class GradientDescentSuite extends FunSuite with MLlibTestSparkContext with Matc
 
 
   test("Test the loss and gradient of first iteration with regularization.") {
-    val paramPool = new ParamMap()
-    val gradient = new LogisticGradient(paramPool)
+    val params = new ParamMap()
+    val gradient = new LogisticGradient(params)
     val updater = new SquaredL2Updater()
-    val lrf = new LrLearnSGD(paramPool, null)
-    val gd = new GradientDescent(gradient, updater, paramPool)
+    val lrf = new LrLearnSGD(params, null)
+    val gd = new GradientDescent(gradient, updater, params)
 
     // Add a extra variable consisting of all 1.0's for the intercept.
     val testData = GradientDescentSuite.generateGDInput(2.0, -1.5, 1000, 42)
@@ -100,20 +100,20 @@ class GradientDescentSuite extends FunSuite with MLlibTestSparkContext with Matc
     initialWeightsWithIntercept.w.update(0, 1.0)
     initialWeightsWithIntercept.w.update(1, 0.5)
 
-    paramPool.put(gd.numIterations, 1)
-    paramPool.put(gd.miniBatchFraction, 1.0)
-    paramPool.put(gd.stepSize, 1.0)
-    paramPool.put(gd.convergenceTol, 1E-4)
-    paramPool.put(lrf.reg, Array(0.0))
+    params.put(gd.numIterations, 1)
+    params.put(gd.miniBatchFraction, 1.0)
+    params.put(gd.stepSize, 1.0)
+    params.put(gd.convergenceTol, 1E-4)
+    params.put(lrf.reg, Array(0.0))
 
     val (newWeights0, loss0) = gd.optimizeWithHistory(
-      dataRDD, initialWeightsWithIntercept, paramPool(lrf.reg))
+      dataRDD, initialWeightsWithIntercept, params(lrf.reg))
 
-    paramPool.put(gd.numIterations, 1)
-    paramPool.put(lrf.reg, Array(1.0))
+    params.put(gd.numIterations, 1)
+    params.put(lrf.reg, Array(1.0))
 
     val (newWeights1, loss1) = gd.optimizeWithHistory(
-      dataRDD, initialWeightsWithIntercept, paramPool(lrf.reg))
+      dataRDD, initialWeightsWithIntercept, params(lrf.reg))
 
     assert(
       loss1(0) ~= (loss0(0) + (math.pow(initialWeightsWithIntercept.w(0), 2) +

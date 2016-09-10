@@ -16,8 +16,8 @@ trait ModelParam extends Serializable {
   /**
     * 将模型参数值转成字符串形式
     *
-    * @param paramPool 参数池
+    * @param params 参数池
     * @return 模型参数值的字符串形式
     */
-  def mkString(paramPool: ParamMap): String
+  def mkString(params: ParamMap): String
 }

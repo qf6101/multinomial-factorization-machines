@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
   * Created by qfeng on 15-3-11.
   */
 
-class GradientDescent(private var gradient: Gradient, private var updater: Updater, private var paramPool: ParamMap)
+class GradientDescent(private var gradient: Gradient, private var updater: Updater, private var params: ParamMap)
   extends Optimizer with SGDParam with Logging {
 
   override def optimize(data: RDD[(Double, SparseVector[Double])],
@@ -27,9 +27,9 @@ class GradientDescent(private var gradient: Gradient, private var updater: Updat
                           initialCoeffs: Coefficients,
                           regParam: Array[Double]): (Coefficients, Array[Double]) = {
     //获取参数
-    val numIterationsValue = paramPool(numIterations)
-    val miniBatchFractionValue = paramPool(miniBatchFraction)
-    val stepSizeValue = paramPool(stepSize)
+    val numIterationsValue = params(numIterations)
+    val miniBatchFractionValue = params(miniBatchFraction)
+    val stepSizeValue = params(stepSize)
     //初始化系数、正则值
     var coeffs = initialCoeffs.copy
     var regVal = updater.compute(coeffs, coeffs.copyEmpty(), 0, 1, regParam)._2
@@ -81,6 +81,6 @@ class GradientDescent(private var gradient: Gradient, private var updater: Updat
     */
   private def isConverged(newCoeffs: Coefficients, oldCoeffs: Coefficients): (Boolean, Double) = {
     val solutionDiff = newCoeffs.normDiff(oldCoeffs)
-    (solutionDiff < paramPool(convergenceTol) * Math.max(newCoeffs.norm, 1.0), solutionDiff)
+    (solutionDiff < params(convergenceTol) * Math.max(newCoeffs.norm, 1.0), solutionDiff)
   }
 }

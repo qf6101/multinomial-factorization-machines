@@ -15,7 +15,7 @@ import scala.collection.mutable.{ArrayBuffer, HashMap}
   */
 
 
-class LBFGS(private var gradient: Gradient, private var updater: Updater, private var paramPool: ParamMap) extends
+class LBFGS(private var gradient: Gradient, private var updater: Updater, private var params: ParamMap) extends
 Optimizer with LBFGSParam with Logging {
   override def optimize(data: RDD[(Double, SparseVector[Double])],
                         initialCoeffs: Coefficients,
@@ -31,9 +31,9 @@ Optimizer with LBFGSParam with Logging {
                           negativePenalty: Double = 1.0):
   (Coefficients, Array[Double]) = {
     //获取参数
-    val numIterationsValue = paramPool(numIterations)
-    val numCorrectionsValue = paramPool(numCorrections)
-    val convergenceTolValue = paramPool(convergenceTol)
+    val numIterationsValue = params(numIterations)
+    val numCorrectionsValue = params(numCorrections)
+    val convergenceTolValue = params(convergenceTol)
     //初始化损失值数组、数据集大小
     val lossHistory = new ArrayBuffer[Double](numIterationsValue)
     val numExamples = data.count()

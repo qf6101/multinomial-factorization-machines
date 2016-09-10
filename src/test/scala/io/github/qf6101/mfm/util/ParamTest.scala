@@ -9,7 +9,7 @@ import org.apache.spark.ml.param.{Param, ParamMap}
   */
 object ParamTest {
   def main(args: Array[String]) {
-    val paramPool = new ParamMap()
+    val params = new ParamMap()
     val otherPool = new ParamMap()
 
     val param1: Param[Double] = new Param("ParamTest", "param1", "param1")
@@ -17,15 +17,15 @@ object ParamTest {
     val param3: Param[Double] = new Param("ParamTest", "param3", "param3")
     val param4: Param[Double] = new Param("ParamTest", "param4", "param4")
 
-    paramPool.put[Double](param1, 1.0)
-    paramPool.put[Double](param1, 2.0)
-    paramPool.put[Double](param2, 5.0)
+    params.put[Double](param1, 1.0)
+    params.put[Double](param1, 2.0)
+    params.put[Double](param2, 5.0)
 
     otherPool.put[Double](param2, 10.0)
     otherPool.put[Double](param3, 7.0)
     otherPool.put[Double](param4, 8.0)
 
-    paramPool ++= otherPool
-    println(ParamUtil.paramPoolToString(paramPool))
+    params ++= otherPool
+    println(ParamUtil.paramPoolToString(params))
   }
 }
