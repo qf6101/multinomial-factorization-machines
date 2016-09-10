@@ -2,7 +2,7 @@ package io.github.qf6101.mfm.logisticregression
 
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.MLModel
-import io.github.qf6101.mfm.baseframe.binary.BinModel
+import io.github.qf6101.mfm.baseframe.binomial.BinModel
 import io.github.qf6101.mfm.util.Logging
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.param.ParamMap

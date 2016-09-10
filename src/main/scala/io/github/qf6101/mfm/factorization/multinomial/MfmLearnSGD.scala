@@ -2,7 +2,7 @@ package io.github.qf6101.mfm.factorization.multinomial
 
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.mutinomial.{MultiLearner, MultiModel}
-import io.github.qf6101.mfm.factorization.binary.{FmCoefficients, FmGradient, FmModel}
+import io.github.qf6101.mfm.factorization.binomial.{FmCoefficients, FmGradient, FmModel}
 import io.github.qf6101.mfm.optimization.{GradientDescent, Updater}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.rdd.RDD

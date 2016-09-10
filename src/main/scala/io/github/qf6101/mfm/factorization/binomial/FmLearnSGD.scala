@@ -1,8 +1,8 @@
-package io.github.qf6101.mfm.factorization.binary
+package io.github.qf6101.mfm.factorization.binomial
 
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.MLModel
-import io.github.qf6101.mfm.baseframe.binary.{BinLearner, BinModel}
+import io.github.qf6101.mfm.baseframe.binomial.{BinLearner, BinModel}
 import io.github.qf6101.mfm.optimization.{GradientDescent, Updater}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.rdd.RDD

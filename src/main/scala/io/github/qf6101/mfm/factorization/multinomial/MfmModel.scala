@@ -2,7 +2,7 @@ package io.github.qf6101.mfm.factorization.multinomial
 
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.mutinomial.MultiModel
-import io.github.qf6101.mfm.factorization.binary.FmModel
+import io.github.qf6101.mfm.factorization.binomial.FmModel
 import org.apache.spark.ml.param.ParamMap
 
 /**

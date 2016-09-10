@@ -1,4 +1,4 @@
-package io.github.qf6101.mfm.baseframe.binary
+package io.github.qf6101.mfm.baseframe.binomial
 
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.{Coefficients, MLModel}

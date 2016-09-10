@@ -1,7 +1,7 @@
-package io.github.qf6101.mfm.factorization.binary
+package io.github.qf6101.mfm.factorization.binomial
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.baseframe.binary.BinModel
+import io.github.qf6101.mfm.baseframe.binomial.BinModel
 import io.github.qf6101.mfm.util.Logging
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.param.ParamMap

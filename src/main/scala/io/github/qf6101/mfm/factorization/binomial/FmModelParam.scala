@@ -1,6 +1,6 @@
-package io.github.qf6101.mfm.factorization.binary
+package io.github.qf6101.mfm.factorization.binomial
 
-import io.github.qf6101.mfm.baseframe.binary.BinModelParam
+import io.github.qf6101.mfm.baseframe.binomial.BinModelParam
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 
 /**

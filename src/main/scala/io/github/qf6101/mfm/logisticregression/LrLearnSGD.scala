@@ -1,7 +1,7 @@
 package io.github.qf6101.mfm.logisticregression
 
 import breeze.linalg.SparseVector
-import io.github.qf6101.mfm.baseframe.binary.{BinLearner, BinModel}
+import io.github.qf6101.mfm.baseframe.binomial.{BinLearner, BinModel}
 import io.github.qf6101.mfm.baseframe.{MLLearner, MLModel}
 import io.github.qf6101.mfm.optimization.{GradientDescent, Updater}
 import org.apache.spark.ml.param.ParamMap

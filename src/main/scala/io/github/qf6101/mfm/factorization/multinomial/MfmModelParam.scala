@@ -1,7 +1,7 @@
 package io.github.qf6101.mfm.factorization.multinomial
 
 import io.github.qf6101.mfm.baseframe.mutinomial.MultiModelParam
-import io.github.qf6101.mfm.factorization.binary.FmModelParam
+import io.github.qf6101.mfm.factorization.binomial.FmModelParam
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 
 /**

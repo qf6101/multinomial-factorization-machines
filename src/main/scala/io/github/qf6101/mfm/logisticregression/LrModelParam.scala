@@ -1,7 +1,7 @@
 package io.github.qf6101.mfm.logisticregression
 
 import io.github.qf6101.mfm.baseframe.ModelParam
-import io.github.qf6101.mfm.baseframe.binary.BinModelParam
+import io.github.qf6101.mfm.baseframe.binomial.BinModelParam
 import org.apache.spark.ml.param.{Param, ParamMap}
 
 

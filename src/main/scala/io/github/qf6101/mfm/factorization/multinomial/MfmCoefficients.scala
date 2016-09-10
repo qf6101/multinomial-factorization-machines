@@ -1,7 +1,7 @@
 package io.github.qf6101.mfm.factorization.multinomial
 
 import io.github.qf6101.mfm.baseframe.Coefficients
-import io.github.qf6101.mfm.factorization.binary.FmCoefficients
+import io.github.qf6101.mfm.factorization.binomial.FmCoefficients
 
 /**
   * Created by qfeng on 16-9-7.

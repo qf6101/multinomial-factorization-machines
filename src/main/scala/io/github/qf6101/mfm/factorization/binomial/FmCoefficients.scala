@@ -1,4 +1,4 @@
-package io.github.qf6101.mfm.factorization.binary
+package io.github.qf6101.mfm.factorization.binomial
 
 import breeze.linalg.{DenseMatrix, DenseVector}
 import io.github.qf6101.mfm.baseframe.Coefficients
@@ -12,7 +12,7 @@ import scala.math._
 
 /**
   * Factorization Machine模型系数
- *
+  *
   * @param numFeatures 特征个数
   * @param numFactors 因子个数
   * @param k0 是否需要处理截距
@@ -217,7 +217,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 计算L1的正则值
- *
+    *
     * @param reg 正则参数
     * @return 参数绝对值加权后的L1正则值
     */

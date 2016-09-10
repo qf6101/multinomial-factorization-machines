@@ -1,4 +1,4 @@
-package io.github.qf6101.mfm.baseframe.binary
+package io.github.qf6101.mfm.baseframe.binomial
 
 import io.github.qf6101.mfm.baseframe.ModelParam
 import org.apache.spark.ml.param.{Param, ParamValidators}
