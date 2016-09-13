@@ -80,17 +80,10 @@ abstract class Coefficients extends Serializable {
   /**
     * 对应系数乘上同一实数，加至复制this的类上
     *
-    * @param multiplier  乘数
+    * @param multiplier 乘数
     * @return 乘法结果
     */
   def *(multiplier: Double): Coefficients
-
-  /**
-    * 转成字符串描述，用于saveModel等方法
-    *
-    * @return 系数的字符串描述
-    */
-  def toString(): String
 
   /**
     * 计算L2的正则值
@@ -154,4 +147,34 @@ abstract class Coefficients extends Serializable {
     result -= other
     result
   }
+
+  /**
+    * 保存系数至文件
+    *
+    * @param location
+    */
+  def save(location: String): Unit = {
+    saveMeta(location + "/" + Coefficients.namingMetaFile)
+    saveData(location + "/" + Coefficients.namingDataFile)
+  }
+
+  /**
+    * 保存元数据至文件
+    *
+    * @param location 文件位置
+    */
+  def saveMeta(location: String): Unit
+
+  /**
+    * 保存数据至文件
+    *
+    * @param location 文件位置
+    */
+  def saveData(location: String): Unit
+}
+
+object Coefficients {
+  val namingCoeffType: String = "coeff_type"
+  val namingMetaFile: String = "coeff_meta"
+  val namingDataFile: String = "coeff_data"
 }

@@ -3,8 +3,7 @@ package io.github.qf6101.mfm.baseframe.binomial
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.{Coefficients, MLModel}
 import io.github.qf6101.mfm.tuning.BinaryClassificationMetrics
-import io.github.qf6101.mfm.util.{HDFSUtil, Logging}
-import org.apache.spark.SparkContext
+import io.github.qf6101.mfm.util.Logging
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
@@ -18,13 +17,14 @@ import scala.util.control.Breaks
 /**
   * 预测模型基类
   *
-  * @param coeffs 模型系数
   * @param paramMeta 模型参赛
-  * @param params 参数池（保存参数的值）
+  * @param coeffs    模型系数
+  * @param params    参数池（保存参数的值）
   */
-abstract class BinModel(override val coeffs: Coefficients,
-                        val paramMeta: BinModelParam,
-                        override val params: ParamMap) extends MLModel(coeffs, params) with Logging with Serializable {
+abstract class BinModel(override val paramMeta: BinModelParam,
+                        override val coeffs: Coefficients,
+                        override val params: ParamMap)
+  extends MLModel(paramMeta, coeffs, params) with Logging with Serializable {
   //设置默认的阈值为0.5
   params.put(paramMeta.binaryThreshold, 0.5)
 
@@ -34,7 +34,7 @@ abstract class BinModel(override val coeffs: Coefficients,
     * @param data 输入数据
     * @return 预测值(0~1)
     */
-  def regressionPredict(data: SparseVector[Double]): Double
+  def predict(data: SparseVector[Double]): Double
 
   /**
     * 对输入数据集进行预测
@@ -42,72 +42,47 @@ abstract class BinModel(override val coeffs: Coefficients,
     * @param dataSet 输入数据集
     * @return 预测值集合(0~1)
     */
-  def regressionPredict(dataSet: RDD[SparseVector[Double]]): RDD[Double] = {
-    dataSet.map(regressionPredict)
+  def predict(dataSet: RDD[SparseVector[Double]]): RDD[Double] = {
+    dataSet.map(predict)
   }
 
-  /**
-    * 对输入数据集进行预测
-    *
-    * @param dataSet 输入数据集
-    * @return 预测值集合(0/1)
-    */
-  def classifPredict(dataSet: RDD[SparseVector[Double]]): RDD[Double] = {
-    dataSet.map(classifPredict)
-  }
+  //  /**
+  //    * 保存模型
+  //    *
+  //    * @param attachedInfo 模型文件中附加的信息（例如learner和model等信息）
+  //    * @param file 保存模型的位置
+  //    */
+  //  def saveModel(attachedInfo: String, file: String): Unit = {
+  //    val sb = new StringBuilder(this.toString)
+  //    //描述模型质量
+  //    sb ++= "\n======== attached segment ========\n"
+  //    sb ++= attachedInfo
+  //    //保存模型
+  //    HDFSUtil.deleteIfExists(file)
+  //    SparkContext.getOrCreate().parallelize(Array(sb.toString())).repartition(1).saveAsTextFile(file)
+  //  }
 
-  /**
-    * 对输入数据进行预测
-    *
-    * @param data 输入数据
-    * @return 预测值(0/1)
-    */
-  def classifPredict(data: SparseVector[Double]): Double = {
-    val score = regressionPredict(data)
-    if (score > params(paramMeta.binaryThreshold)) {
-      1.0
-    } else {
-      0.0
-    }
-  }
-
-  /**
-    * 保存模型
-    *
-    * @param attachedInfo 模型文件中附加的信息（例如learner和model等信息）
-    * @param file 保存模型的位置
-    */
-  def saveModel(attachedInfo: String, file: String): Unit = {
-    val sb = new StringBuilder(this.toString)
-    //描述模型质量
-    sb ++= "\n======== attached segment ========\n"
-    sb ++= attachedInfo
-    //保存模型
-    HDFSUtil.deleteIfExists(file)
-    SparkContext.getOrCreate().parallelize(Array(sb.toString())).repartition(1).saveAsTextFile(file)
-  }
-
-  /**
-    * 将模型信息转成字符串，包含三部分信息：
-    * （1）特征映射
-    * （2）模型系数
-    * （3）模型参数
-    *
-    * @return 字符串表示的模型信息
-    */
-  override def toString: String = {
-    val sb = new StringBuilder()
-    //描述模型系数
-    val coeffString = coeffs.toString()
-    sb ++= s"======= coefficient segment: ${coeffString.split("\n").length} ========\n"
-    sb ++= coeffString
-    sb += '\n'
-    //描述模型参数
-    sb ++= "======== parameter segment ========\n"
-    sb ++= paramMeta.mkString(params)
-    //返回结果
-    sb.toString()
-  }
+  //  /**
+  //    * 将模型信息转成字符串，包含三部分信息：
+  //    * （1）特征映射
+  //    * （2）模型系数
+  //    * （3）模型参数
+  //    *
+  //    * @return 字符串表示的模型信息
+  //    */
+  //  override def toString: String = {
+  //    val sb = new StringBuilder()
+  //    //描述模型系数
+  //    val coeffString = coeffs.toString()
+  //    sb ++= s"======= coefficient segment: ${coeffString.split("\n").length} ========\n"
+  //    sb ++= coeffString
+  //    sb += '\n'
+  //    //描述模型参数
+  //    sb ++= "======== parameter segment ========\n"
+  //    sb ++= paramMeta.mkString(params)
+  //    //返回结果
+  //    sb.toString()
+  //  }
 
   /**
     * 选择二分分离器的阈值（固定AUC，选择F1-score最大的阈值）
@@ -117,7 +92,7 @@ abstract class BinModel(override val coeffs: Coefficients,
   def selectThreshold(dataSet: RDD[(Double, SparseVector[Double])]): Array[BinaryClassificationMetrics] = {
     //生成对数据集的预测结果并持久化
     val scoreAndLabels = dataSet.map { case (label, data) =>
-      (regressionPredict(data), label)
+      (predict(data), label)
     }.persist(StorageLevel.MEMORY_AND_DISK_SER)
     //以0.05为间隔，尝试每个threshold，选择F1_score最大的threshold
     //直至遇到F1_score为NaN，停止尝试

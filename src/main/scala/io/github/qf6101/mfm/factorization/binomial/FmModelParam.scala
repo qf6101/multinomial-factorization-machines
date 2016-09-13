@@ -1,7 +1,11 @@
 package io.github.qf6101.mfm.factorization.binomial
 
+import io.github.qf6101.mfm.baseframe.ModelParam
 import io.github.qf6101.mfm.baseframe.binomial.BinModelParam
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
+import org.apache.spark.sql.SparkSession
+import org.json4s.JsonAST
+import org.json4s.JsonDSL._
 
 /**
   * Created by qfeng on 15-1-26.
@@ -22,76 +26,61 @@ trait FmModelParam extends BinModelParam {
   val maxInteractFeatures: Param[Int] = new Param("FmModelParam", "maxInteractFeatures", "参与2阶项的最大特征维度（不包含）", ParamValidators.gt(0))
 
   /**
-    * 将模型参数值转成字符串形式
+    * Transform parameters to json object
     *
-    * @param params 参数池
-    * @return 模型参数值的字符串形式
+    * @return parameters in json format
     */
-  override def mkString(params: ParamMap): String = {
-    val sb = new StringBuilder()
-    sb ++= "binaryThreshold:"
-    sb ++= "%1.2f".format(params(binaryThreshold))
-    sb ++= " reg0:"
-    sb ++= params(reg0).toString
-    sb ++= " reg1:"
-    sb ++= params(reg1).toString
-    sb ++= " reg2:"
-    sb ++= params(reg2).toString
-    sb ++= " numFeatures:"
-    sb ++= params(numFeatures).toString
-    sb ++= " numFactors:"
-    sb ++= params(numFactors).toString
-    sb ++= " k0:"
-    sb ++= params(k0).toString
-    sb ++= " k1:"
-    sb ++= params(k1).toString
-    sb ++= " k2:"
-    sb ++= params(k2).toString
-    sb ++= " initMean:"
-    sb ++= params(initMean).toString
-    sb ++= " initStdev:"
-    sb ++= params(initStdev).toString
-    sb ++= " maxInteractFeatures:"
-    sb ++= params(maxInteractFeatures).toString
-    sb.toString()
+  override def toJSON(params: ParamMap): JsonAST.JObject = {
+    super.toJSON(params) ~
+      (ModelParam.namingParamType -> this.getClass.toString()) ~
+      (reg0.name -> params(reg0)) ~
+      (reg1.name -> params(reg1)) ~
+      (reg2.name -> params(reg2)) ~
+      (numFeatures.name -> params(numFeatures)) ~
+      (numFactors.name -> params(numFactors)) ~
+      (k0.name -> params(k0)) ~
+      (k1.name -> params(k1)) ~
+      (k2.name -> params(k2)) ~
+      (maxInteractFeatures.name -> params(maxInteractFeatures))
   }
 }
 
 object FmModelParam {
   /**
-    * 根据字符串数组构造分解机模型参数
+    * 从参数文件构造分解机模型参数
     *
-    * @param content 字符串
-    * @param params 参数池
+    * @param location 参数文件位置
+    * @param params   参数池
     * @return 分解机型参数
     */
-  def apply(content: String, params: ParamMap): FmModelParam = {
+  def apply(location: String, params: ParamMap): FmModelParam = {
     val fmModelParam = new FmModelParam {}
-    val codeArray = content.split(" ")
-    val binaryThreshold = codeArray(0).split(":")(1).trim.toDouble
-    val reg0 = codeArray(1).split(":")(1).trim.toDouble
-    val reg1 = codeArray(2).split(":")(1).trim.toDouble
-    val reg2 = codeArray(3).split(":")(1).trim.toDouble
-    val numAttrs = codeArray(4).split(":")(1).trim.toInt
-    val numFactors = codeArray(5).split(":")(1).trim.toInt
-    val k0 = codeArray(6).split(":")(1).trim.toBoolean
-    val k1 = codeArray(7).split(":")(1).trim.toBoolean
-    val k2 = codeArray(8).split(":")(1).trim.toBoolean
-    val initMean = codeArray(9).split(":")(1).trim.toDouble
-    val initStdev = codeArray(10).split(":")(1).trim.toDouble
-    val maxInteractAttr = codeArray(11).split(":")(1).trim.toInt
+    val spark = SparkSession.builder().getOrCreate()
+    val paramValues = spark.read.json(location).first()
+    val binaryThreshold = paramValues.getAs[Double](fmModelParam.binaryThreshold.name)
+    val reg0 = paramValues.getAs[Double](fmModelParam.reg0.name)
+    val reg1 = paramValues.getAs[Double](fmModelParam.reg1.name)
+    val reg2 = paramValues.getAs[Double](fmModelParam.reg2.name)
+    val numFeatures = paramValues.getAs[Int](fmModelParam.numFeatures.name)
+    val numFactors = paramValues.getAs[Int](fmModelParam.numFactors.name)
+    val k0 = paramValues.getAs[Boolean](fmModelParam.k0.name)
+    val k1 = paramValues.getAs[Boolean](fmModelParam.k1.name)
+    val k2 = paramValues.getAs[Boolean](fmModelParam.k2.name)
+    val initMean = paramValues.getAs[Double](fmModelParam.initMean.name)
+    val initStdev = paramValues.getAs[Double](fmModelParam.initStdev.name)
+    val maxInteractFeatures = paramValues.getAs[Int](fmModelParam.maxInteractFeatures.name)
     params.put(fmModelParam.binaryThreshold, binaryThreshold)
     params.put(fmModelParam.reg0, reg0)
     params.put(fmModelParam.reg1, reg1)
     params.put(fmModelParam.reg2, reg2)
-    params.put(fmModelParam.numFeatures, numAttrs)
+    params.put(fmModelParam.numFeatures, numFeatures)
     params.put(fmModelParam.numFactors, numFactors)
     params.put(fmModelParam.k0, k0)
     params.put(fmModelParam.k1, k1)
     params.put(fmModelParam.k2, k2)
     params.put(fmModelParam.initMean, initMean)
     params.put(fmModelParam.initStdev, initStdev)
-    params.put(fmModelParam.maxInteractFeatures, maxInteractAttr)
+    params.put(fmModelParam.maxInteractFeatures, maxInteractFeatures)
     fmModelParam
   }
 }

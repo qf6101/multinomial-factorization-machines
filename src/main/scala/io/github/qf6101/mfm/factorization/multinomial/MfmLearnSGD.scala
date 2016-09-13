@@ -25,6 +25,6 @@ class MfmLearnSGD(override val params: ParamMap,
       params(maxInteractFeatures), params(numFactors), params(k0), params(k1), params(k2), params(numClasses))
     val regs = Array(params(reg0), params(reg1), params(reg2))
     val coeffs = gd.optimize(dataset, initialCoeffs, regs)
-    new MfmModel(coeffs.asInstanceOf[MfmCoefficients], this, params)
+    new MfmModel(this, coeffs.asInstanceOf[MfmCoefficients], params)
   }
 }

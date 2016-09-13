@@ -34,7 +34,7 @@ class FmLearnSGD(override val params: ParamMap,
       params(numFeatures), params(maxInteractFeatures), params(numFactors), params(k0), params(k1), params(k2))
     val regs = Array(params(reg0), params(reg1), params(reg2))
     val coeffs = gd.optimize(dataset, initialCoeffs, regs)
-    new FmModel(coeffs.asInstanceOf[FmCoefficients], this, params)
+    new FmModel(this, coeffs.asInstanceOf[FmCoefficients], params)
   }
 }
 

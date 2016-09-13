@@ -39,11 +39,11 @@ class FmWithoutCV extends FunSuite with MLlibTestSparkContext {
 
     val model = fmLearn.train(training)
     val validating = testing.map { case (label, features) =>
-      (model.regressionPredict(features), label)
+      (model.predict(features), label)
     }
     val metrics = new BinaryClassificationMetrics(validating)
     val AUC = metrics.AUC
     println(AUC)
-    model.saveModel(metrics.toString, System.getProperty("user.dir") + "/../testdata/mlalgorithms/output/" + DateTime.now().toString("yyyyMMdd.HHmmss"))
+//    model.saveModel(metrics.toString, System.getProperty("user.dir") + "/../testdata/mlalgorithms/output/" + DateTime.now().toString("yyyyMMdd.HHmmss"))
   }
 }

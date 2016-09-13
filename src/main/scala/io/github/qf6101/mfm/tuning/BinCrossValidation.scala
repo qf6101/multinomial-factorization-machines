@@ -52,7 +52,7 @@ class BinCrossValidation(val learner: BinLearner,
         splits.zipWithIndex.foreach { case ((training, testing), splitIndex) =>
           models(paramValueIndex) = learner.train(training)
           val validating = testing.map { case (label, features) =>
-            (models(paramValueIndex).regressionPredict(features), label)
+            (models(paramValueIndex).predict(features), label)
           }
           val metrics = new BinaryClassificationMetrics(validating)
           val AUC = metrics.AUC
@@ -71,7 +71,7 @@ class BinCrossValidation(val learner: BinLearner,
     learner.updateParams(selectedParamMap)
     val fullModel = learner.train(dataset)
     val fullValidating = dataset.map { case (label, features) =>
-      (fullModel.regressionPredict(features), label)
+      (fullModel.predict(features), label)
     }
     val fullMetrics = new BinaryClassificationMetrics(fullValidating)
     (fullModel, fullMetrics)
@@ -101,7 +101,7 @@ class BinCrossValidation(val learner: BinLearner,
       learner.updateParams(baseParamMap)
       val model = learner.train(dataset)
       val validating = dataset.map { case (label, features) =>
-        (model.regressionPredict(features), label)
+        (model.predict(features), label)
       }
       val metrics = new BinaryClassificationMetrics(validating)
       //AUC值大于阈值，则返回

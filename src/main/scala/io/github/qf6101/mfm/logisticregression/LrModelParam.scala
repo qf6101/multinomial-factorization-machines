@@ -3,6 +3,9 @@ package io.github.qf6101.mfm.logisticregression
 import io.github.qf6101.mfm.baseframe.ModelParam
 import io.github.qf6101.mfm.baseframe.binomial.BinModelParam
 import org.apache.spark.ml.param.{Param, ParamMap}
+import org.apache.spark.sql.SparkSession
+import org.json4s.JsonAST
+import org.json4s.JsonDSL._
 
 
 /**
@@ -16,22 +19,14 @@ trait LrModelParam extends BinModelParam {
   val reg: Param[Array[Double]] = new Param("LrModelParam", "reg", "正则参数")
 
   /**
-    * 将模型参数值转成字符串形式
+    * Transform parameters to json object
     *
-    * @param params 参数池
-    * @return 模型参数值的字符串形式
+    * @return parameters in json format
     */
-  override def mkString(params: ParamMap): String = {
-    val sb = new StringBuilder()
-    sb ++= "binaryThreshold:"
-    sb ++= "%1.2f".format(params(binaryThreshold))
-    sb ++= " reg:"
-    sb ++= params(reg).mkString(", ")
-    sb ++= " initMean:"
-    sb ++= params(initMean).toString
-    sb ++= " initStdev:"
-    sb ++= params(initStdev).toString
-    sb.toString()
+  override def toJSON(params: ParamMap): JsonAST.JObject = {
+    super.toJSON(params) ~
+      (ModelParam.namingParamType -> this.getClass.toString) ~
+      (reg.name -> params(reg).mkString(", "))
   }
 }
 
@@ -39,17 +34,18 @@ object LrModelParam {
   /**
     * 根据字符串数组构造逻辑斯蒂模型参数
     *
-    * @param content 字符串
-    * @param params 参数池
+    * @param location 文件位置
+    * @param params   参数池
     * @return 逻辑斯蒂模型参数
     */
-  def apply(content: String, params: ParamMap): LrModelParam = {
+  def apply(location: String, params: ParamMap): LrModelParam = {
     val lrModelParam = new LrModelParam {}
-    val codeArray = content.split(" ")
-    val binaryThreshold = codeArray(0).split(":")(1).trim.toDouble
-    val reg = codeArray(1).split(":")(1).split(",").map(_.trim.toDouble)
-    val initMean = codeArray(2).split(":")(1).trim.toDouble
-    val initStdev = codeArray(3).split(":")(1).trim.toDouble
+    val spark = SparkSession.builder().getOrCreate()
+    val paramValues = spark.read.json(location).first()
+    val binaryThreshold = paramValues.getAs[Double](lrModelParam.binaryThreshold.name)
+    val reg = paramValues.getAs[String](lrModelParam.reg.name).split(",").map(_.trim.toDouble)
+    val initMean = paramValues.getAs[Double](lrModelParam.initMean.name)
+    val initStdev = paramValues.getAs[Double](lrModelParam.initStdev.name)
     params.put(lrModelParam.binaryThreshold, binaryThreshold)
     params.put(lrModelParam.reg, reg)
     params.put(lrModelParam.initMean, initMean)

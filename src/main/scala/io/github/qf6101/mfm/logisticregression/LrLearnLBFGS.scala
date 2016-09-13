@@ -40,7 +40,7 @@ class LrLearnLBFGS(override val params: ParamMap,
     }
     val coeffs = lbfgs.optimize(dataSet, inputCoeffs, params(reg))
     dataSet.unpersist()
-    new LrModel(coeffs.asInstanceOf[VectorCoefficients], this, params)
+    new LrModel(this, coeffs.asInstanceOf[VectorCoefficients], params)
   }
 }
 

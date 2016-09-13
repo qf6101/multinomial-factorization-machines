@@ -2,8 +2,10 @@ package io.github.qf6101.mfm.logisticregression
 
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.Coefficients
+import org.apache.spark.sql.SparkSession
+import org.json4s.JsonDSL._
+import org.json4s.jackson.JsonMethods._
 
-import scala.collection.mutable
 import scala.collection.mutable.HashMap
 import scala.math._
 
@@ -16,6 +18,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 同时复制this的结构和内容
+    *
     * @return 复制的拷贝
     */
   override def copy: Coefficients = {
@@ -24,8 +27,9 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 用Map稀疏向量初始化
+    *
     * @param w0 截距
-    * @param w Map稀疏向量表示的参数
+    * @param w  Map稀疏向量表示的参数
     */
   def this(size: Int, w0: Double, w: HashMap[Int, Double]) {
     this(size)
@@ -35,14 +39,16 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 只复制this的结构（比如参数个数），不复制内容
+    *
     * @return 复制的拷贝
     */
   override def copyEmpty(): Coefficients = new VectorCoefficients(this.size)
 
   /**
     * 对应系数加法，加至this上
+    *
     * @param otherW0 截距加数
-    * @param otherW 一阶系数加数
+    * @param otherW  一阶系数加数
     * @return this
     */
   def +=(otherW0: Double, otherW: SparseVector[Double]): VectorCoefficients = {
@@ -56,6 +62,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 对应系数加法，加至this上
+    *
     * @param other 加数
     * @return this
     */
@@ -71,6 +78,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 对应系数减法，减至this上
+    *
     * @param other 减数
     * @return this
     */
@@ -87,6 +95,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
   /**
     *
     * 对应系数加上同一实数，加至复制this的类上
+    *
     * @param addend 加数
     * @return 加法结果（拷贝）
     */
@@ -99,6 +108,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 对应系数除上同一实数，加至复制this的类上
+    *
     * @param dividend 除数
     * @return 除法结果
     */
@@ -111,6 +121,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 计算L2的正则值
+    *
     * @param reg 正则参数
     * @return 参数加权后的L2正则值
     */
@@ -124,6 +135,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 计算L2的正则梯度值
+    *
     * @param reg 正则参数
     * @return 参数加权后的L2正则梯度值
     */
@@ -133,7 +145,8 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 对应系数乘上同一实数，加至复制this的类上
-    * @param multiplier  乘数
+    *
+    * @param multiplier 乘数
     * @return 乘法结果
     */
   override def *(multiplier: Double): Coefficients = {
@@ -167,6 +180,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
 
   /**
     * 计算L1的正则值
+    *
     * @param regParam 正则参数
     * @return 参数绝对值加权后的L1正则值
     */
@@ -194,23 +208,6 @@ class VectorCoefficients(val size: Int) extends Coefficients {
   }
 
   /**
-    * 转成字符串描述，用于saveModel等方法
-    * @return 系数的字符串描述
-    */
-  override def toString: String = {
-    //特征个数:系数个数
-    val sb = new StringBuilder().append(this.size).append(":").append(w.size).append("\n")
-    sb ++= w0.toString
-    sb += '\n'
-    //每个系数及其值
-    w.foreach { case (index, value) =>
-      sb ++= s"$index:$value"
-      sb += '\n'
-    }
-    sb.deleteCharAt(sb.length - 1).mkString
-  }
-
-  /**
     * 计算系数的2范数
     * sum(abs(A).^p)^(1/p) where p=2
     *
@@ -221,30 +218,52 @@ class VectorCoefficients(val size: Int) extends Coefficients {
       sum + value * value
     } + w0 * w0)
   }
+
+  /**
+    * 保存元数据至文件
+    *
+    * @param location 文件位置
+    */
+  override def saveMeta(location: String): Unit = {
+    val json = (Coefficients.namingCoeffType -> this.getClass.toString) ~
+      (VectorCoefficients.namingFeatureSize -> size) ~
+      (VectorCoefficients.namingIntercept -> w0) ~
+      (VectorCoefficients.namingWSize -> w.size)
+    SparkSession.builder().getOrCreate().sparkContext.
+      makeRDD(compact(render(json))).saveAsTextFile(location)
+  }
+
+  /**
+    * 保存数据至文件
+    *
+    * @param location 文件位置
+    */
+  override def saveData(location: String): Unit = {
+    SparkSession.builder().getOrCreate().createDataFrame(w.toSeq).toDF("index", "value").write.parquet(location)
+  }
 }
 
 
 object VectorCoefficients {
+  val namingIntercept = "intercept"
+  val namingFeatureSize = "feature_size"
+  val namingWSize = "w_size"
+
   /**
     * 根据字符串数组构造向量系数
     *
-    * @param content 字符串数组
+    * @param location 系数文件位置
     * @return 向量系数
     */
-  def apply(content: Array[String]): VectorCoefficients = {
-    var codeArray = content(0).split(":")
-    val size = codeArray(0).toInt
-    val activeSize = codeArray(1).toInt
-    val w = mutable.HashMap[Int, Double]()
-    val w0 = content(1).toDouble
-
-    for (i <- 2 to activeSize + 1) {
-      codeArray = content(i).split(":")
-      val index = codeArray(0).toInt
-      val value = codeArray(1).toDouble
-      w += index -> value
-    }
-
-    new VectorCoefficients(size, w0, w)
+  def apply(location: String): VectorCoefficients = {
+    val spark = SparkSession.builder().getOrCreate()
+    import spark.implicits._
+    val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
+    val size = meta.getAs[Int](namingFeatureSize)
+    val w0 = meta.getAs[Double](namingIntercept)
+    val w = spark.read.parquet(location + "/" + Coefficients.namingDataFile).map { row =>
+      (row.getAs[Int]("index"), row.getAs[Double]("value"))
+    }.collect()
+    new VectorCoefficients(size, w0, HashMap[Int, Double](w.toSeq: _*))
   }
 }

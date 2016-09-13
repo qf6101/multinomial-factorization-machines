@@ -43,6 +43,6 @@ class FmCVSuite extends FunSuite with MLlibTestSparkContext {
 
     val cv = new BinCrossValidation(fmLearn, paramGrid, 3)
     val (model, metrics) = cv.selectParamsForClassif(dataset)
-    model.saveModel(metrics.toString, System.getProperty("user.dir") + "/../testdata/mlalgorithms/output/" + DateTime.now().toString("yyyyMMdd.HHmmss"))
+//    model.saveModel(metrics.toString, System.getProperty("user.dir") + "/../testdata/mlalgorithms/output/" + DateTime.now().toString("yyyyMMdd.HHmmss"))
   }
 }

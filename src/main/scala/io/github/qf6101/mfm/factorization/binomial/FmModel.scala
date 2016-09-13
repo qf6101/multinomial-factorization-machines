@@ -1,10 +1,13 @@
 package io.github.qf6101.mfm.factorization.binomial
 
 import breeze.linalg.SparseVector
+import io.github.qf6101.mfm.baseframe.MLModel
 import io.github.qf6101.mfm.baseframe.binomial.BinModel
+import io.github.qf6101.mfm.logisticregression.{LrModelParam, VectorCoefficients}
 import io.github.qf6101.mfm.util.Logging
 import org.apache.spark.SparkContext
 import org.apache.spark.ml.param.ParamMap
+import org.apache.spark.sql.SparkSession
 
 
 /**
@@ -13,21 +16,21 @@ import org.apache.spark.ml.param.ParamMap
 
 /**
   * Factorization Machine模型
- *
+  *
   * @param paramMeta 分解机模型参数
-  * @param params 参数池
+  * @param params    参数池
   */
-class FmModel(override val coeffs: FmCoefficients,
-              override val paramMeta: FmModelParam,
+class FmModel(override val paramMeta: FmModelParam,
+              override val coeffs: FmCoefficients,
               override val params: ParamMap)
-  extends BinModel(coeffs, paramMeta, params) {
+  extends BinModel(paramMeta, coeffs, params) {
   /**
     * 对输入数据进行预测
- *
+    *
     * @param data 输入数据
     * @return 预测值
     */
-  override def regressionPredict(data: SparseVector[Double]): Double = {
+  override def predict(data: SparseVector[Double]): Double = {
     val score = FmModel.linearScore(data, paramMeta, params, coeffs)
     1.0 / (1.0 + math.exp(-score))
   }
@@ -74,31 +77,13 @@ object FmModel extends Logging {
   /**
     * 从文件载入分解机模型
     *
-    * @param file 包含分解机型信息的文件(可以从FmModel.saveModel获得)
+    * @param location 包含分解机型信息的文件
     * @return 分解机模型
     */
-  def apply(file: String): FmModel = {
-    FmModel(SparkContext.getOrCreate().textFile(file).collect())
-  }
-
-  /**
-    * 从字符串数组载入分解机模型
-    *
-    * @param content 包含模型信息的字符串数组（可以从FmModel.toString.split("\n")获得）
-    * @return 分解机模型
-    */
-  def apply(content: Array[String]): FmModel = {
-    var currentLine = 0
-    val numCoeffSegmentLines = content(currentLine).split(":")(1).split(" ")(1).trim.toInt
-    currentLine += 1
-    val endLine = currentLine + numCoeffSegmentLines
-    val coefficientsLines = content.slice(currentLine, endLine)
-    currentLine = endLine
-    val coefficients = FmCoefficients(coefficientsLines)
-    //解析模型参数(parameter segment)
+  def apply(location: String): FmModel = {
     val params = new ParamMap()
-    val fmModelParam = FmModelParam(content(currentLine + 1), params)
-    //返回结果
-    new FmModel(coefficients, fmModelParam, params)
+    val paramMeta = FmModelParam(location + "/" + MLModel.namingParamFile, params)
+    val coefficients = FmCoefficients(location + "/" + MLModel.namingCoeffFile)
+    new FmModel(paramMeta, coefficients, params)
   }
 }

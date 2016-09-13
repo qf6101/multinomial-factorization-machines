@@ -3,6 +3,9 @@ package io.github.qf6101.mfm.factorization.binomial
 import breeze.linalg.{DenseMatrix, DenseVector}
 import io.github.qf6101.mfm.baseframe.Coefficients
 import io.github.qf6101.mfm.util.GaussianRandom
+import org.apache.spark.sql.SparkSession
+import org.json4s.JsonDSL._
+import org.json4s.jackson.JsonMethods._
 
 import scala.math._
 
@@ -14,10 +17,10 @@ import scala.math._
   * Factorization Machine模型系数
   *
   * @param numFeatures 特征个数
-  * @param numFactors 因子个数
-  * @param k0 是否需要处理截距
-  * @param k1 是否需要处理一阶参数
-  * @param k2 是否需要处理二阶参数
+  * @param numFactors  因子个数
+  * @param k0          是否需要处理截距
+  * @param k1          是否需要处理一阶参数
+  * @param k2          是否需要处理二阶参数
   */
 class FmCoefficients(val initMean: Double,
                      val initStdev: Double,
@@ -33,10 +36,10 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 用breeze稀疏向量和CSC稀疏矩阵初始化模型系数
- *
+    *
     * @param w0 0阶系数
-    * @param w 1阶系数
-    * @param v 2阶系数
+    * @param w  1阶系数
+    * @param v  2阶系数
     * @param k0 是否需要处理截距
     * @param k1 是否需要处理一阶参数
     * @param k2 是否需要处理二阶参数
@@ -50,7 +53,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 只复制this的结构（比如参数个数），不复制内容
- *
+    *
     * @return 复制的拷贝
     */
   override def copyEmpty(): Coefficients = new FmCoefficients(this.initMean, this.initMean,
@@ -58,7 +61,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数加法，加至this上
- *
+    *
     * @param other 加数
     * @return this
     */
@@ -72,7 +75,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数减法，减至this上
- *
+    *
     * @param other 减数
     * @return this
     */
@@ -86,7 +89,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数加上同一实数，加至复制this的类上
- *
+    *
     * @param addend 加数
     * @return 加法结果（拷贝）
     */
@@ -100,8 +103,8 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数乘上同一实数，加至复制this的类上
- *
-    * @param multiplier  乘数
+    *
+    * @param multiplier 乘数
     * @return 乘法结果
     */
   override def *(multiplier: Double): Coefficients = {
@@ -131,7 +134,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 对应系数除上同一实数，加至复制this的类上
- *
+    *
     * @param dividend 除数
     * @return 除法结果
     */
@@ -145,7 +148,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 计算L2的正则值
- *
+    *
     * @param reg 正则参数
     * @return 参数加权后的L2正则值
     */
@@ -158,7 +161,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 计算L2的正则梯度值
- *
+    *
     * @param reg 正则参数
     * @return 参数加权后的L2正则梯度值
     */
@@ -253,7 +256,7 @@ class FmCoefficients(val initMean: Double,
 
   /**
     * 转成字符串描述，用于saveModel等方法
- *
+    *
     * @return 系数的字符串描述
     */
   override def toString(): String = {
@@ -277,7 +280,7 @@ class FmCoefficients(val initMean: Double,
     sb ++= w0.toString
     sb ++= "\n"
     //1阶系数（从大到小排序）
-    w.iterator.toList.sortBy(-_._2).foreach { case(index, value) =>
+    w.iterator.toList.sortBy(-_._2).foreach { case (index, value) =>
       sb ++= index.toString
       sb ++= ","
       sb ++= value.toString
@@ -295,45 +298,69 @@ class FmCoefficients(val initMean: Double,
     //返回结果
     sb.deleteCharAt(sb.length - 1).toString()
   }
+
+  /**
+    * 保存元数据至文件
+    *
+    * @param location 文件位置
+    */
+  override def saveMeta(location: String): Unit = {
+    val json = (Coefficients.namingCoeffType -> this.getClass.toString) ~
+      (FmCoefficients.namingIntercept -> w0) ~
+      (FmCoefficients.namingWSize -> w.size) ~
+      (FmCoefficients.namingVRows -> v.rows) ~
+      (FmCoefficients.namingVCols -> v.cols) ~
+      (FmCoefficients.namingK0 -> k0) ~
+      (FmCoefficients.namingK1 -> k1) ~
+      (FmCoefficients.namingK2 -> k2)
+    SparkSession.builder().getOrCreate().sparkContext.
+      makeRDD(compact(render(json))).saveAsTextFile(location)
+  }
+
+  /**
+    * 保存数据至文件
+    *
+    * @param location 文件位置
+    */
+  override def saveData(location: String): Unit = {
+    val spark = SparkSession.builder().getOrCreate()
+    spark.createDataFrame(w.data.map(Tuple1(_))).toDF("value").write.parquet(location + "/w")
+    spark.createDataFrame(v.data.map(Tuple1(_))).toDF("value").write.parquet(location + "/v")
+  }
 }
 
 object FmCoefficients {
+  val namingIntercept = "intercept"
+  val namingWSize = "w_size"
+  val namingVRows = "v_rows"
+  val namingVCols = "v_cols"
+  val namingK0 = "k0"
+  val namingK1 = "k1"
+  val namingK2 = "k2"
+
   /**
-    * 根据字符串数组构造分解机系数
+    * 系数文件构造分解机系数
     *
-    * @param content 字符串数组
+    * @param location 系数文件
     * @return 分解机系数
     */
-  def apply(content: Array[String]): FmCoefficients = {
-    //获取各阶系数的尺寸
-    val codeArray = content(0).split(":")
-    val wLength = codeArray(0).trim.toInt
-    val sizeCodeArray = codeArray(1).split(",")
-    val vRows = sizeCodeArray(0).toInt
-    val vCols = sizeCodeArray(1).toInt
-    val vActiveSize = sizeCodeArray(2).toInt
-    //获取是否处理各阶系数的标识
-    val identifierCodeArray = codeArray(2).split(",")
-    val k0 = identifierCodeArray(0).toBoolean
-    val k1 = identifierCodeArray(1).toBoolean
-    val k2 = identifierCodeArray(2).toBoolean
-    //获取0阶系数
-    val w0 = content(1).trim.toDouble
-    //获取1阶系数
-    val w = DenseVector.zeros[Double](wLength)
-    for (i <- 0 until wLength) {
-      val codes = content(i + 2).trim.split(",")
-      w.update(codes(0).toInt, codes(1).toDouble)
-    }
-    //获取2阶系数
-    val v = DenseMatrix.zeros[Double](vRows, vCols)
-    for (i <- 0 until vActiveSize) {
-      val codeArray = content(i + wLength + 2).split(",")
-      val rowIndex = codeArray(0).toInt
-      val colIndex = codeArray(1).toInt
-      val value = codeArray(2).toDouble
-      v.update(rowIndex, colIndex, value)
-    }
+  def apply(location: String): FmCoefficients = {
+    val spark = SparkSession.builder().getOrCreate()
+    import spark.implicits._
+    val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
+    val w0 = meta.getAs[Double](namingIntercept)
+    val vRows = meta.getAs[Int](namingVRows)
+    val vCols = meta.getAs[Int](namingVCols)
+    val k0 = meta.getAs[Boolean](namingK0)
+    val k1 = meta.getAs[Boolean](namingK1)
+    val k2 = meta.getAs[Boolean](namingK2)
+    val w = DenseVector(spark.read.parquet(location + "/" + Coefficients.namingDataFile + "/w").map { row =>
+      row.getAs[Double]("value")
+    }.collect())
+    val v = DenseMatrix.create(vRows, vCols, spark.read.parquet(location + "/" + Coefficients.namingDataFile + "/v")
+      .map { row =>
+        row.getAs[Double]("value")
+      }.collect())
     //返回结果
     new FmCoefficients(w0, w, v, k0, k1, k2)
   }

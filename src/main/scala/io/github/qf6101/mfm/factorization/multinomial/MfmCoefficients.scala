@@ -2,6 +2,9 @@ package io.github.qf6101.mfm.factorization.multinomial
 
 import io.github.qf6101.mfm.baseframe.Coefficients
 import io.github.qf6101.mfm.factorization.binomial.FmCoefficients
+import org.apache.spark.sql.SparkSession
+import org.json4s.JsonDSL._
+import org.json4s.jackson.JsonMethods._
 
 /**
   * Created by qfeng on 16-9-7.
@@ -172,13 +175,41 @@ class MfmCoefficients(val initMean: Double,
   }
 
   /**
-    * 转成字符串描述，用于saveModel等方法
+    * 保存元数据至文件
     *
-    * @return 系数的字符串描述
+    * @param location 文件位置
     */
-  override def toString(): String = ???
+  override def saveMeta(location: String): Unit = {
+    val json = (Coefficients.namingCoeffType -> this.getClass.toString) ~
+      (MfmCoefficients.namingNumClasses -> numClasses)
+    SparkSession.builder().getOrCreate().sparkContext.
+      makeRDD(compact(render(json))).saveAsTextFile(location)
+  }
+
+  /**
+    * 保存数据至文件
+    *
+    * @param location 文件位置
+    */
+  override def saveData(location: String): Unit = {
+    thetas.zipWithIndex.foreach { case (theta, index) =>
+      theta.saveMeta(location + "/" + index + "/" + Coefficients.namingMetaFile)
+      theta.saveMeta(location + "/" + index + "/" + Coefficients.namingDataFile)
+    }
+  }
 }
 
 object MfmCoefficients {
-  def apply(content: Array[String]): MfmCoefficients = ???
+  val namingNumClasses = "num_classes"
+
+  def apply(location: String): MfmCoefficients = {
+    val spark = SparkSession.builder().getOrCreate()
+    val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
+    val numClasses = meta.getAs[Int](namingNumClasses)
+    val thetas = Array.fill[FmCoefficients](numClasses)(null)
+    for (index <- 0 until numClasses) {
+      thetas(index) = FmCoefficients(location + "/" + index)
+    }
+    new MfmCoefficients(thetas)
+  }
 }
