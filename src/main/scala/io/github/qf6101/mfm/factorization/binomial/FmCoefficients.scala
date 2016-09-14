@@ -314,7 +314,7 @@ class FmCoefficients(val initMean: Double,
       (FmCoefficients.namingK1 -> k1) ~
       (FmCoefficients.namingK2 -> k2)
     SparkSession.builder().getOrCreate().sparkContext.
-      makeRDD(compact(render(json))).saveAsTextFile(location)
+      makeRDD(List(compact(render(json)))).repartition(1).saveAsTextFile(location)
   }
 
   /**

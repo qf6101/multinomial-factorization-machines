@@ -2,7 +2,7 @@ package io.github.qf6101.mfm.optimization
 
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.logisticregression.{LogisticGradient, LrLearnSGD, VectorCoefficients}
-import io.github.qf6101.mfm.util.MLlibTestSparkContext
+import io.github.qf6101.mfm.util.MfmTestSparkSession
 import io.github.qf6101.mfm.util.TestingUtils._
 import org.apache.spark.ml.param.ParamMap
 import org.scalatest.{FunSuite, Matchers}
@@ -47,7 +47,7 @@ object GradientDescentSuite {
   }
 }
 
-class GradientDescentSuite extends FunSuite with MLlibTestSparkContext with Matchers {
+class GradientDescentSuite extends FunSuite with MfmTestSparkSession with Matchers {
   test("Assert the loss is decreasing.") {
     val nPoints = 1000
     val A = 2.0
@@ -61,7 +61,7 @@ class GradientDescentSuite extends FunSuite with MLlibTestSparkContext with Matc
 
     // Add a extra variable consisting of all 1.0's for the intercept.
     val testData = GradientDescentSuite.generateGDInput(A, B, nPoints, 42)
-    val dataRDD = sc.parallelize(testData, 2).cache()
+    val dataRDD = spark.sparkContext.parallelize(testData, 2).cache()
     val initialWeightsWithIntercept = new VectorCoefficients(2)
     initialWeightsWithIntercept.w.update(0, 1.0)
     initialWeightsWithIntercept.w.update(1, -1.0)
@@ -93,7 +93,7 @@ class GradientDescentSuite extends FunSuite with MLlibTestSparkContext with Matc
 
     // Add a extra variable consisting of all 1.0's for the intercept.
     val testData = GradientDescentSuite.generateGDInput(2.0, -1.5, 1000, 42)
-    val dataRDD = sc.parallelize(testData, 2).cache()
+    val dataRDD = spark.sparkContext.parallelize(testData, 2).cache()
 
     // Prepare non-zero weights
     val initialWeightsWithIntercept = new VectorCoefficients(2)

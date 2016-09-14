@@ -1,18 +1,16 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.binomial
 
-import io.github.qf6101.mfm.factorization.binomial.FmLearnSGD
 import io.github.qf6101.mfm.optimization.SquaredL2Updater
 import io.github.qf6101.mfm.tuning.{BinCrossValidation, BinParamGridBuilder}
-import io.github.qf6101.mfm.util.{LoadDSUtil, MLlibTestSparkContext}
+import io.github.qf6101.mfm.util.{LoadDSUtil, MfmTestSparkSession}
 import org.apache.spark.ml.param.ParamMap
-import org.joda.time.DateTime
 import org.scalatest.FunSuite
 
 /**
   * Created by qfeng on 15-4-2.
   */
 
-class FmCVSuite extends FunSuite with MLlibTestSparkContext {
+class FmCVSuite extends FunSuite with MfmTestSparkSession {
   test("test factorization machine with cross validation") {
     val params = new ParamMap()
     val updater = new SquaredL2Updater()

@@ -46,44 +46,6 @@ abstract class BinModel(override val paramMeta: BinModelParam,
     dataSet.map(predict)
   }
 
-  //  /**
-  //    * 保存模型
-  //    *
-  //    * @param attachedInfo 模型文件中附加的信息（例如learner和model等信息）
-  //    * @param file 保存模型的位置
-  //    */
-  //  def saveModel(attachedInfo: String, file: String): Unit = {
-  //    val sb = new StringBuilder(this.toString)
-  //    //描述模型质量
-  //    sb ++= "\n======== attached segment ========\n"
-  //    sb ++= attachedInfo
-  //    //保存模型
-  //    HDFSUtil.deleteIfExists(file)
-  //    SparkContext.getOrCreate().parallelize(Array(sb.toString())).repartition(1).saveAsTextFile(file)
-  //  }
-
-  //  /**
-  //    * 将模型信息转成字符串，包含三部分信息：
-  //    * （1）特征映射
-  //    * （2）模型系数
-  //    * （3）模型参数
-  //    *
-  //    * @return 字符串表示的模型信息
-  //    */
-  //  override def toString: String = {
-  //    val sb = new StringBuilder()
-  //    //描述模型系数
-  //    val coeffString = coeffs.toString()
-  //    sb ++= s"======= coefficient segment: ${coeffString.split("\n").length} ========\n"
-  //    sb ++= coeffString
-  //    sb += '\n'
-  //    //描述模型参数
-  //    sb ++= "======== parameter segment ========\n"
-  //    sb ++= paramMeta.mkString(params)
-  //    //返回结果
-  //    sb.toString()
-  //  }
-
   /**
     * 选择二分分离器的阈值（固定AUC，选择F1-score最大的阈值）
     *

@@ -16,7 +16,7 @@ object ParamUtil {
     * @param params 参数池
     * @return 字符串
     */
-  def paramPoolToString(params: ParamMap): String = {
+  def paramsToString(params: ParamMap): String = {
     params.toSeq.map { paramPair => paramPair.value match {
       case v: Array[_] => s"${paramPair.param.name}:${v.mkString(",")}"
       case _ => s"${paramPair.param.name}:${paramPair.value}"

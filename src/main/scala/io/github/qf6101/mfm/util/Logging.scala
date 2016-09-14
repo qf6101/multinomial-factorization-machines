@@ -1,26 +1,65 @@
 package io.github.qf6101.mfm.util
-
-import org.apache.log4j.Logger
+import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Created by qfeng on 16-8-30.
   */
-trait Logging extends Serializable {
-  private[this] val LOGGER = Logger.getLogger(this.getClass.toString)
 
-  protected def logInfo(msg: String, t: Throwable = null): Unit = {
-    if (t == null) LOGGER.info(msg) else LOGGER.info(msg, t)
+trait Logging {
+  @transient private var log_ : Logger = null
+
+  protected def logName = {
+    this.getClass.getName.stripSuffix("$")
   }
 
-  protected def logError(msg: String, t: Throwable = null): Unit = {
-    if (t == null) LOGGER.error(msg) else LOGGER.error(msg, t)
+  protected def log: Logger = {
+    if (log_ == null) {
+      log_ = LoggerFactory.getLogger(logName)
+    }
+    log_
   }
 
-  protected def logWarning(msg: String, t: Throwable = null): Unit = {
-    if (t == null) LOGGER.warn(msg) else LOGGER.warn(msg, t)
+  protected def logInfo(msg: => String) {
+    if (log.isInfoEnabled) log.info(msg)
   }
 
-  protected def logDebug(msg: String, t: Throwable = null): Unit = {
-    if (t == null) LOGGER.debug(msg) else LOGGER.debug(msg, t)
+  protected def logDebug(msg: => String) {
+    if (log.isDebugEnabled) log.debug(msg)
+  }
+
+  protected def logTrace(msg: => String) {
+    if (log.isTraceEnabled) log.trace(msg)
+  }
+
+  protected def logWarning(msg: => String) {
+    if (log.isWarnEnabled) log.warn(msg)
+  }
+
+  protected def logError(msg: => String) {
+    if (log.isErrorEnabled) log.error(msg)
+  }
+
+  protected def logInfo(msg: => String, throwable: Throwable) {
+    if (log.isInfoEnabled) log.info(msg, throwable)
+  }
+
+  protected def logDebug(msg: => String, throwable: Throwable) {
+    if (log.isDebugEnabled) log.debug(msg, throwable)
+  }
+
+  protected def logTrace(msg: => String, throwable: Throwable) {
+    if (log.isTraceEnabled) log.trace(msg, throwable)
+  }
+
+  protected def logWarning(msg: => String, throwable: Throwable) {
+    if (log.isWarnEnabled) log.warn(msg, throwable)
+  }
+
+  protected def logError(msg: => String, throwable: Throwable) {
+    if (log.isErrorEnabled) log.error(msg, throwable)
+  }
+
+  protected def isTraceEnabled(): Boolean = {
+    log.isTraceEnabled
   }
 }

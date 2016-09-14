@@ -1,6 +1,5 @@
-package io.github.qf6101.mfm.factorization
+package io.github.qf6101.mfm.factorization.binomial
 
-import io.github.qf6101.mfm.factorization.binomial.FmModel
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**

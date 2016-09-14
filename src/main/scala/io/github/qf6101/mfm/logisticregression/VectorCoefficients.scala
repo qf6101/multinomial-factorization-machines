@@ -230,7 +230,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
       (VectorCoefficients.namingIntercept -> w0) ~
       (VectorCoefficients.namingWSize -> w.size)
     SparkSession.builder().getOrCreate().sparkContext.
-      makeRDD(compact(render(json))).saveAsTextFile(location)
+      makeRDD(List(compact(render(json)))).repartition(1).saveAsTextFile(location)
   }
 
   /**

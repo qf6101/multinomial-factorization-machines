@@ -61,7 +61,7 @@ class BinCrossValidation(val learner: BinLearner,
         }
         //计算AUC均值
         AUCs(paramValueIndex) /= splits.length
-        logInfo(s"selected parameters: ${ParamUtil.paramPoolToString(paramMap)}; >>>>> AUC: ${AUCs(paramValueIndex).formatted("%1.4f")}")
+        logInfo(s"selected parameters: ${ParamUtil.paramsToString(paramMap)}; >>>>> AUC: ${AUCs(paramValueIndex).formatted("%1.4f")}")
       }
       //挑选出AUC最大的参数值
       val (_, bestIndex) = AUCs.zipWithIndex.maxBy(_._1)

@@ -30,10 +30,10 @@ class MfmGradient(paramMeta: MfmModelParam, params: ParamMap) extends Gradient w
     val multipliers = scores.zipWithIndex.map { case (score, index) =>
       if (label.toInt == index) 1.0 - score else -score
     }
+    //参与2阶项的最大维度
+    val maxInteractFeatures = params(paramMeta.maxInteractFeatures)
     val loss = -math.log(scores(label.toInt))
     (mfmCoeff.thetas zip mfmCumGradient.thetas zip multipliers).foreach { case ((fmCoeff, fmCumGradient), multiplier) =>
-      //参与2阶项的最大维度
-      val maxInteractAttr = params(paramMeta.maxInteractFeatures)
       //0阶梯度
       if (params(paramMeta.k0)) {
         fmCumGradient.w0 += multiplier
@@ -49,13 +49,13 @@ class MfmGradient(paramMeta: MfmModelParam, params: ParamMap) extends Gradient w
         for (factorIndex <- 0 until params(paramMeta.numFactors)) {
           //提前计算（因为求和中每一项都会用到）firstMoment = \sum_j^n {v_jf*x_j} （固定f）
           val firstMoment = data.activeIterator.foldLeft(0.0) { case (sum, (index, value)) =>
-            if (index < maxInteractAttr) {
+            if (index < maxInteractFeatures) {
               sum + fmCoeff.v(index, factorIndex) * value
             } else sum
           }
           //计算2阶梯度
           data.activeIterator.foreach { case (index, value) =>
-            if (index < maxInteractAttr) {
+            if (index < maxInteractFeatures) {
               val twoWayCumCoeff = fmCumGradient.v(index, factorIndex)
               val twoWayCoeff = fmCoeff.v(index, factorIndex)
               val incrementGradient = twoWayCumCoeff + multiplier * ((value * firstMoment) - (twoWayCoeff * value * value))

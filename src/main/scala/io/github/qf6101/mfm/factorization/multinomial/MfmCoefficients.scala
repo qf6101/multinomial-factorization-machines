@@ -32,7 +32,7 @@ class MfmCoefficients(val initMean: Double,
     *
     * @return 复制的拷贝
     */
-  override def copyEmpty(): Coefficients = new MfmCoefficients(this.initMean, this.initMean,
+  override def copyEmpty(): Coefficients = new MfmCoefficients(this.initMean, this.initStdev,
     this.numFeatures, this.numInteractFeatures, this.numFactors, this.k0, this.k1, this.k2, this.numClasses)
 
   /**
@@ -183,7 +183,7 @@ class MfmCoefficients(val initMean: Double,
     val json = (Coefficients.namingCoeffType -> this.getClass.toString) ~
       (MfmCoefficients.namingNumClasses -> numClasses)
     SparkSession.builder().getOrCreate().sparkContext.
-      makeRDD(compact(render(json))).saveAsTextFile(location)
+      makeRDD(List(compact(render(json)))).repartition(1).saveAsTextFile(location)
   }
 
   /**

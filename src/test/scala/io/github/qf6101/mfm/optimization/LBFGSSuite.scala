@@ -1,7 +1,7 @@
 package io.github.qf6101.mfm.optimization
 
 import io.github.qf6101.mfm.logisticregression.{LogisticGradient, LrLearnLBFGS, VectorCoefficients}
-import io.github.qf6101.mfm.util.MLlibTestSparkContext
+import io.github.qf6101.mfm.util.MfmTestSparkSession
 import io.github.qf6101.mfm.util.TestingUtils._
 import org.apache.spark.ml.param.ParamMap
 import org.scalatest.FunSuite
@@ -12,8 +12,8 @@ import org.scalatest.FunSuite
   */
 
 
-class LBFGSSuite extends FunSuite with MLlibTestSparkContext {
-  lazy val dataRDD = sc.parallelize(testData, 2).cache()
+class LBFGSSuite extends FunSuite with MfmTestSparkSession {
+  lazy val dataRDD = spark.sparkContext.parallelize(testData, 2).cache()
   val nPoints = 1000
   val A = 2.0
   val B = -1.5

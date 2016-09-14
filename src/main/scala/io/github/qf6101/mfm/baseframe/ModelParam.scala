@@ -26,7 +26,7 @@ trait ModelParam extends Serializable {
     */
   def save(location: String, params: ParamMap): Unit = {
     SparkSession.builder().getOrCreate().sparkContext.
-      makeRDD(List(compact(render(this.toJSON(params))))).saveAsTextFile(location)
+      makeRDD(List(compact(render(this.toJSON(params))))).repartition(1).saveAsTextFile(location)
   }
 
   /**
