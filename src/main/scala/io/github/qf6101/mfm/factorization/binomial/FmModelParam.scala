@@ -61,14 +61,14 @@ object FmModelParam {
     val reg0 = paramValues.getAs[Double](fmModelParam.reg0.name)
     val reg1 = paramValues.getAs[Double](fmModelParam.reg1.name)
     val reg2 = paramValues.getAs[Double](fmModelParam.reg2.name)
-    val numFeatures = paramValues.getAs[Int](fmModelParam.numFeatures.name)
-    val numFactors = paramValues.getAs[Int](fmModelParam.numFactors.name)
+    val numFeatures = paramValues.getAs[Long](fmModelParam.numFeatures.name).toInt
+    val numFactors = paramValues.getAs[Long](fmModelParam.numFactors.name).toInt
     val k0 = paramValues.getAs[Boolean](fmModelParam.k0.name)
     val k1 = paramValues.getAs[Boolean](fmModelParam.k1.name)
     val k2 = paramValues.getAs[Boolean](fmModelParam.k2.name)
     val initMean = paramValues.getAs[Double](fmModelParam.initMean.name)
     val initStdev = paramValues.getAs[Double](fmModelParam.initStdev.name)
-    val maxInteractFeatures = paramValues.getAs[Int](fmModelParam.maxInteractFeatures.name)
+    val maxInteractFeatures = paramValues.getAs[Long](fmModelParam.maxInteractFeatures.name).toInt
     params.put(fmModelParam.binaryThreshold, binaryThreshold)
     params.put(fmModelParam.reg0, reg0)
     params.put(fmModelParam.reg1, reg1)

@@ -43,15 +43,15 @@ object MfmModelParam {
     val reg0 = paramValues.getAs[Double](mfmModelParam.reg0.name)
     val reg1 = paramValues.getAs[Double](mfmModelParam.reg1.name)
     val reg2 = paramValues.getAs[Double](mfmModelParam.reg2.name)
-    val numFeatures = paramValues.getAs[Int](mfmModelParam.numFeatures.name)
-    val numFactors = paramValues.getAs[Int](mfmModelParam.numFactors.name)
+    val numFeatures = paramValues.getAs[Long](mfmModelParam.numFeatures.name).toInt
+    val numFactors = paramValues.getAs[Long](mfmModelParam.numFactors.name).toInt
     val k0 = paramValues.getAs[Boolean](mfmModelParam.k0.name)
     val k1 = paramValues.getAs[Boolean](mfmModelParam.k1.name)
     val k2 = paramValues.getAs[Boolean](mfmModelParam.k2.name)
     val initMean = paramValues.getAs[Double](mfmModelParam.initMean.name)
     val initStdev = paramValues.getAs[Double](mfmModelParam.initStdev.name)
-    val maxInteractFeatures = paramValues.getAs[Int](mfmModelParam.maxInteractFeatures.name)
-    val numClasses = paramValues.getAs[Int](mfmModelParam.numClasses.name)
+    val maxInteractFeatures = paramValues.getAs[Long](mfmModelParam.maxInteractFeatures.name).toInt
+    val numClasses = paramValues.getAs[Long](mfmModelParam.numClasses.name).toInt
     params.put(mfmModelParam.binaryThreshold, binaryThreshold)
     params.put(mfmModelParam.reg0, reg0)
     params.put(mfmModelParam.reg1, reg1)

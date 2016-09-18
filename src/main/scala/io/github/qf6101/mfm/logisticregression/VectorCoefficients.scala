@@ -259,10 +259,10 @@ object VectorCoefficients {
     val spark = SparkSession.builder().getOrCreate()
     import spark.implicits._
     val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
-    val size = meta.getAs[Int](namingFeatureSize)
+    val size = meta.getAs[Long](namingFeatureSize).toInt
     val w0 = meta.getAs[Double](namingIntercept)
     val w = spark.read.parquet(location + "/" + Coefficients.namingDataFile).map { row =>
-      (row.getAs[Int]("index"), row.getAs[Double]("value"))
+      (row.getAs[Long]("index").toInt, row.getAs[Double]("value"))
     }.collect()
     new VectorCoefficients(size, w0, HashMap[Int, Double](w.toSeq: _*))
   }

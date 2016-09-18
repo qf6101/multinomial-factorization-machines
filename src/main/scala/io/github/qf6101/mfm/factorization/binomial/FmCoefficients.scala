@@ -349,8 +349,8 @@ object FmCoefficients {
     import spark.implicits._
     val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
     val w0 = meta.getAs[Double](namingIntercept)
-    val vRows = meta.getAs[Int](namingVRows)
-    val vCols = meta.getAs[Int](namingVCols)
+    val vRows = meta.getAs[Long](namingVRows).toInt
+    val vCols = meta.getAs[Long](namingVCols).toInt
     val k0 = meta.getAs[Boolean](namingK0)
     val k1 = meta.getAs[Boolean](namingK1)
     val k2 = meta.getAs[Boolean](namingK2)

@@ -205,7 +205,7 @@ object MfmCoefficients {
   def apply(location: String): MfmCoefficients = {
     val spark = SparkSession.builder().getOrCreate()
     val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
-    val numClasses = meta.getAs[Int](namingNumClasses)
+    val numClasses = meta.getAs[Long](namingNumClasses).toInt
     val thetas = Array.fill[FmCoefficients](numClasses)(null)
     for (index <- 0 until numClasses) {
       thetas(index) = FmCoefficients(location + "/" + index)
