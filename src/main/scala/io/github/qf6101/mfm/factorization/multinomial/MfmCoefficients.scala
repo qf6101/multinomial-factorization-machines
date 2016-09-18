@@ -145,7 +145,7 @@ class MfmCoefficients(val initMean: Double,
     * @return 复制的拷贝
     */
   override def copy: Coefficients = {
-    new MfmCoefficients(this.thetas)
+    new MfmCoefficients(this.thetas.map(_.copy.asInstanceOf[FmCoefficients]))
   }
 
   /**

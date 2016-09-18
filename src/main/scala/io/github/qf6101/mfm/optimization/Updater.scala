@@ -90,7 +90,7 @@ class SquaredL2Updater(private val decreasingStrategy: DecreasingStrategy = new 
     // the gradient of the regularizer (= regParam * weightsOld)
     // w' = w - thisIterStepSize * (gradient + regParam * w)
     val thisIterStepSize = stepSize / decreasingStrategy.decrease(iter)
-    val coeffNew = coeffOld + (((gradient + coeffOld.L2RegGradient(regParam)) * (-thisIterStepSize)))
+    val coeffNew = coeffOld + ((gradient + coeffOld.L2RegGradient(regParam)) * (-thisIterStepSize))
     (coeffNew, coeffNew.L2RegValue(regParam))
   }
 }

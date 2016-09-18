@@ -28,7 +28,7 @@ class MfmGradient(paramMeta: MfmModelParam, params: ParamMap) extends Gradient w
     val mfmCumGradient = cumGradient.asInstanceOf[MfmCoefficients]
     val scores = MfmModel.predict(data, paramMeta, params, mfmCoeff)
     val multipliers = scores.zipWithIndex.map { case (score, index) =>
-      if (label.toInt == index) 1.0 - score else -score
+      if (label.toInt == index) score - 1.0 else score
     }
     //参与2阶项的最大维度
     val maxInteractFeatures = params(paramMeta.maxInteractFeatures)
