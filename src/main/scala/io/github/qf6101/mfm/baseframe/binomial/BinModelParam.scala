@@ -10,7 +10,7 @@ import org.json4s.JsonDSL._
   */
 trait BinModelParam extends ModelParam {
   //default value: 0.5
-  val binaryThreshold: Param[Double] = new Param("ModelParam", "binaryThreshold", "threshold for binary classification", ParamValidators.inRange(0, 1, false, false))
+  val binaryThreshold: Param[Double] = new Param("BinModelParam", "binaryThreshold", "threshold for binary classification", ParamValidators.inRange(0, 1, false, false))
 
   /**
     * Transform parameters to json object

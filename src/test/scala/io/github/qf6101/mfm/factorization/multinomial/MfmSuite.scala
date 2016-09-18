@@ -2,7 +2,7 @@ package io.github.qf6101.mfm.factorization.multinomial
 
 import breeze.linalg.argmax
 import io.github.qf6101.mfm.optimization.SquaredL2Updater
-import io.github.qf6101.mfm.util.{LoadDSUtil, MfmTestSparkSession}
+import io.github.qf6101.mfm.util.{HDFSUtil, LoadDSUtil, MfmTestSparkSession}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
 import org.scalatest.FunSuite
@@ -43,5 +43,7 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     println("weighted precision: " + metrics.weightedPrecision)
     println("weighted recall: " + metrics.weightedRecall)
     println("weighted f-measure: " + metrics.weightedFMeasure)
+    HDFSUtil.deleteIfExists("test_data/output/mnist")
+    model.save("test_data/output/mnist")
   }
 }

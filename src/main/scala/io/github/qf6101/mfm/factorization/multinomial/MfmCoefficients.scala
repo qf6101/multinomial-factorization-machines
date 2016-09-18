@@ -194,7 +194,7 @@ class MfmCoefficients(val initMean: Double,
   override def saveData(location: String): Unit = {
     thetas.zipWithIndex.foreach { case (theta, index) =>
       theta.saveMeta(location + "/" + index + "/" + Coefficients.namingMetaFile)
-      theta.saveMeta(location + "/" + index + "/" + Coefficients.namingDataFile)
+      theta.saveData(location + "/" + index + "/" + Coefficients.namingDataFile)
     }
   }
 }

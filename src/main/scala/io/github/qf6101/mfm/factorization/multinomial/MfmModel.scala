@@ -12,6 +12,8 @@ import org.apache.spark.ml.param.ParamMap
 class MfmModel(override val paramMeta: MfmModelParam,
                override val coeffs: MfmCoefficients,
                override val params: ParamMap) extends MultiModel(paramMeta, coeffs, params) {
+  //dump, 设置默认的阈值为0.5
+  params.put(paramMeta.binaryThreshold, 0.5)
   /**
     * 对输入数据进行预测
     *
