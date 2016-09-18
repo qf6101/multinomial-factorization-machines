@@ -1,8 +1,8 @@
 package io.github.qf6101.mfm.factorization.multinomial
 
+import breeze.linalg.argmax
 import io.github.qf6101.mfm.optimization.SquaredL2Updater
-import io.github.qf6101.mfm.tuning.BinaryClassificationMetrics
-import io.github.qf6101.mfm.util.{HDFSUtil, LoadDSUtil, MfmTestSparkSession}
+import io.github.qf6101.mfm.util.{LoadDSUtil, MfmTestSparkSession}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
 import org.scalatest.FunSuite
@@ -14,12 +14,12 @@ import org.scalatest.FunSuite
 class MfmSuite extends FunSuite with MfmTestSparkSession {
   test("test binomial factorization machines") {
     val (training, numFeatures) = LoadDSUtil.loadLibSVMDataSet("test_data/input/mnist/mnist.scale")
-//    val (testing, numFeatures) = LoadDSUtil.loadLibSVMDataSet("test_data/input/mnist/mnist.scale.t")
+    val (testing, _) = LoadDSUtil.loadLibSVMDataSet("test_data/input/mnist/mnist.scale.t")
     val params = new ParamMap()
     val updater = new SquaredL2Updater()
     val mfmLearn = new MfmLearnSGD(params, updater)
     params.put(mfmLearn.gd.numIterations, 10)
-    params.put(mfmLearn.gd.stepSize, 0.05)
+    params.put(mfmLearn.gd.stepSize, 0.5)
     params.put(mfmLearn.gd.miniBatchFraction, 1.0)
     params.put(mfmLearn.gd.convergenceTol, 1E-5)
     params.put(mfmLearn.numFeatures, numFeatures)
@@ -35,13 +35,13 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     params.put(mfmLearn.reg2, 0.01)
     params.put(mfmLearn.numClasses, 10)
     val model = mfmLearn.train(training)
-    val validating = training.map { case (label, features) =>
-      (model.predict(features), label)
+    val validating = testing.map { case (label, features) =>
+      argmax(model.predict(features)).toDouble -> label
     }
-//    val metrics = new MulticlassMetrics(validating)
-//    val AUC = metrics.AUC
-//    println(AUC)
-//    HDFSUtil.deleteIfExists("test_data/output/a1a")
-//    model.save("test_data/output/a1a")
+    val metrics = new MulticlassMetrics(validating)
+    println("accuracy: " + metrics.accuracy)
+    println("weighted precision: " + metrics.weightedPrecision)
+    println("weighted recall: " + metrics.weightedRecall)
+    println("weighted f-measure: " + metrics.weightedFMeasure)
   }
 }
