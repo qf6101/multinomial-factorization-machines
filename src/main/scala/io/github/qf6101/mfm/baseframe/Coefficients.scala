@@ -171,6 +171,14 @@ abstract class Coefficients extends Serializable {
     * @param location 文件位置
     */
   def saveData(location: String): Unit
+
+  /**
+    * 与另一个系数是否相等
+    *
+    * @param other 另一个系数
+    * @return 是否相等
+    */
+  def equals(other: Coefficients): Boolean
 }
 
 object Coefficients {

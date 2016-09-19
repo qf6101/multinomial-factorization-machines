@@ -255,57 +255,12 @@ class FmCoefficients(val initMean: Double,
   }
 
   /**
-    * 转成字符串描述，用于saveModel等方法
-    *
-    * @return 系数的字符串描述
-    */
-  override def toString(): String = {
-    //各阶系数的尺寸，以及是否处理各阶系数的标识，用冒号隔开
-    val sb = new StringBuilder()
-    sb ++= w.length.toString
-    sb ++= ":"
-    sb ++= v.rows.toString
-    sb ++= ","
-    sb ++= v.cols.toString
-    sb ++= ","
-    sb ++= v.activeSize.toString
-    sb ++= ":"
-    sb ++= k0.toString
-    sb ++= ","
-    sb ++= k1.toString
-    sb ++= ","
-    sb ++= k2.toString
-    sb ++= "\n"
-    //0阶系数
-    sb ++= w0.toString
-    sb ++= "\n"
-    //1阶系数（从大到小排序）
-    w.iterator.toList.sortBy(-_._2).foreach { case (index, value) =>
-      sb ++= index.toString
-      sb ++= ","
-      sb ++= value.toString
-      sb ++= "\n"
-    }
-    //2阶系数
-    v.activeIterator.foreach { case ((rowIndex, colIndex), value) =>
-      sb ++= rowIndex.toString
-      sb ++= ","
-      sb ++= colIndex.toString
-      sb ++= ","
-      sb ++= value.toString
-      sb ++= "\n"
-    }
-    //返回结果
-    sb.deleteCharAt(sb.length - 1).toString()
-  }
-
-  /**
     * 保存元数据至文件
     *
     * @param location 文件位置
     */
   override def saveMeta(location: String): Unit = {
-    val json = (Coefficients.namingCoeffType -> this.getClass.toString) ~
+    val json = (Coefficients.namingCoeffType -> FmCoefficients.getClass.toString) ~
       (FmCoefficients.namingIntercept -> w0) ~
       (FmCoefficients.namingWSize -> w.size) ~
       (FmCoefficients.namingVRows -> v.rows) ~
@@ -324,8 +279,21 @@ class FmCoefficients(val initMean: Double,
     */
   override def saveData(location: String): Unit = {
     val spark = SparkSession.builder().getOrCreate()
-    spark.createDataFrame(w.data.map(Tuple1(_))).toDF("value").write.parquet(location + "/w")
-    spark.createDataFrame(v.data.map(Tuple1(_))).toDF("value").write.parquet(location + "/v")
+    spark.createDataFrame(w.data.map(Tuple1(_))).repartition(1).toDF("value").write.parquet(location + "/w")
+    spark.createDataFrame(v.data.map(Tuple1(_))).repartition(1).toDF("value").write.parquet(location + "/v")
+  }
+
+  /**
+    * 与另一个系数是否相等
+    *
+    * @param other 另一个系数
+    * @return 是否相等
+    */
+  override def equals(other: Coefficients): Boolean = {
+    if(other.isInstanceOf[FmCoefficients]) {
+      val otherCoeffs = other.asInstanceOf[FmCoefficients]
+      if(w0 == otherCoeffs.w0 && w.equals(otherCoeffs.w) && v.equals(otherCoeffs.v)) true else false
+    } else false
   }
 }
 

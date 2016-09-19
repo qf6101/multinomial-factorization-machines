@@ -180,7 +180,7 @@ class MfmCoefficients(val initMean: Double,
     * @param location 文件位置
     */
   override def saveMeta(location: String): Unit = {
-    val json = (Coefficients.namingCoeffType -> this.getClass.toString) ~
+    val json = (Coefficients.namingCoeffType -> MfmCoefficients.getClass.toString) ~
       (MfmCoefficients.namingNumClasses -> numClasses)
     SparkSession.builder().getOrCreate().sparkContext.
       makeRDD(List(compact(render(json)))).repartition(1).saveAsTextFile(location)
@@ -197,6 +197,21 @@ class MfmCoefficients(val initMean: Double,
       theta.saveData(location + "/" + index + "/" + Coefficients.namingDataFile)
     }
   }
+
+  /**
+    * 与另一个系数是否相等
+    *
+    * @param other 另一个系数
+    * @return 是否相等
+    */
+  override def equals(other: Coefficients): Boolean = {
+    if(other.isInstanceOf[MfmCoefficients]) {
+      val otherCoeffs = other.asInstanceOf[MfmCoefficients]
+      (thetas zip otherCoeffs.thetas).foldLeft(true) { case (eq, (me, he)) =>
+        eq && me.equals(he)
+      }
+    } else false
+  }
 }
 
 object MfmCoefficients {
@@ -208,7 +223,7 @@ object MfmCoefficients {
     val numClasses = meta.getAs[Long](namingNumClasses).toInt
     val thetas = Array.fill[FmCoefficients](numClasses)(null)
     for (index <- 0 until numClasses) {
-      thetas(index) = FmCoefficients(location + "/" + index)
+      thetas(index) = FmCoefficients(location + "/" + Coefficients.namingDataFile + "/" + index)
     }
     new MfmCoefficients(thetas)
   }

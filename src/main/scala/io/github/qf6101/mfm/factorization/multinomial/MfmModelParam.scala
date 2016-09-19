@@ -5,8 +5,10 @@ import io.github.qf6101.mfm.baseframe.mutinomial.MultiModelParam
 import io.github.qf6101.mfm.factorization.binomial.FmModelParam
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 import org.apache.spark.sql.SparkSession
-import org.json4s.JsonAST
+import org.json4s.{JObject, JsonAST}
+import org.json4s.JsonAST.JField
 import org.json4s.JsonDSL._
+
 
 
 /**
@@ -21,9 +23,13 @@ trait MfmModelParam extends FmModelParam with MultiModelParam {
     * @return parameters in json format
     */
   override def toJSON(params: ParamMap): JsonAST.JObject = {
-    super.toJSON(params) ~
-      (ModelParam.namingParamType -> this.getClass.toString()) ~
-      (numClasses.name -> params(numClasses))
+    val json = super.toJSON(params) removeField {
+      case JField(ModelParam.namingParamType, _) => true
+      case _ => false
+    }
+    json.asInstanceOf[JObject] ~
+      (numClasses.name -> params(numClasses)) ~
+      (ModelParam.namingParamType -> MfmModelParam.getClass.toString)
   }
 }
 
@@ -32,7 +38,7 @@ object MfmModelParam {
     * 参数文件构造分解机模型参数
     *
     * @param location 文件位置
-    * @param params 参数池
+    * @param params   参数池
     * @return 分解机型参数
     */
   def apply(location: String, params: ParamMap): MfmModelParam = {

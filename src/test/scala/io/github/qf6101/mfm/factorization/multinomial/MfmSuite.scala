@@ -1,7 +1,9 @@
 package io.github.qf6101.mfm.factorization.multinomial
 
 import breeze.linalg.argmax
+import io.github.qf6101.mfm.factorization.binomial.FmModel
 import io.github.qf6101.mfm.optimization.SquaredL2Updater
+import io.github.qf6101.mfm.util.TestingUtils._
 import io.github.qf6101.mfm.util.{HDFSUtil, LoadDSUtil, MfmTestSparkSession}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
@@ -45,5 +47,17 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     println("weighted f-measure: " + metrics.weightedFMeasure)
     HDFSUtil.deleteIfExists("test_data/output/mnist")
     model.save("test_data/output/mnist")
+
+    val reloadModel = MfmModel("test_data/output/mnist")
+    assert(model.equals(reloadModel))
+
+    val reloadValidating = testing.map { case (label, features) =>
+      argmax(reloadModel.predict(features)).toDouble -> label
+    }
+    val reloadMetrics = new MulticlassMetrics(reloadValidating)
+    assert(reloadMetrics.accuracy ~= metrics.accuracy absTol 1E-5)
+    assert(reloadMetrics.weightedPrecision ~= metrics.weightedPrecision absTol 1E-5)
+    assert(reloadMetrics.weightedRecall ~= metrics.weightedRecall absTol 1E-5)
+    assert(reloadMetrics.weightedFMeasure ~= metrics.weightedFMeasure absTol 1E-5)
   }
 }

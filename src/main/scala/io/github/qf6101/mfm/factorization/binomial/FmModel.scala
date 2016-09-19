@@ -3,11 +3,8 @@ package io.github.qf6101.mfm.factorization.binomial
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.MLModel
 import io.github.qf6101.mfm.baseframe.binomial.BinModel
-import io.github.qf6101.mfm.logisticregression.{LrModelParam, VectorCoefficients}
 import io.github.qf6101.mfm.util.Logging
-import org.apache.spark.SparkContext
 import org.apache.spark.ml.param.ParamMap
-import org.apache.spark.sql.SparkSession
 
 
 /**
@@ -33,6 +30,14 @@ class FmModel(override val paramMeta: FmModelParam,
   override def predict(data: SparseVector[Double]): Double = {
     val score = FmModel.linearScore(data, paramMeta, params, coeffs)
     1.0 / (1.0 + math.exp(-score))
+  }
+
+  override def equals(other: MLModel): Boolean = {
+    if (other.isInstanceOf[FmModel]) {
+      val otherModel = other.asInstanceOf[FmModel]
+      if (paramMeta.toJSON(params).equals(otherModel.paramMeta.toJSON(otherModel.params))
+        && coeffs.equals(otherModel.coeffs)) true else false
+    } else false
   }
 }
 

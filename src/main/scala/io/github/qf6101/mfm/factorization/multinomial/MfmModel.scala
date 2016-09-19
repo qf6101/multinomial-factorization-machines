@@ -23,6 +23,14 @@ class MfmModel(override val paramMeta: MfmModelParam,
   override def predict(data: SparseVector[Double]): Array[Double] = {
     MfmModel.predict(data, paramMeta, params, coeffs)
   }
+
+  override def equals(other: MLModel): Boolean = {
+    if(other.isInstanceOf[MfmModel]) {
+      val otherModel = other.asInstanceOf[MfmModel]
+      if (paramMeta.toJSON(params).equals(otherModel.paramMeta.toJSON(otherModel.params))
+        && coeffs.equals(otherModel.coeffs)) true else false
+    } else false
+  }
 }
 
 object MfmModel {

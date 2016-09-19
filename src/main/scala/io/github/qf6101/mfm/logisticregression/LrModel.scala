@@ -44,6 +44,14 @@ class LrModel(override val paramMeta: LrModelParam,
     val margin = -1.0 * coeffs.dot(data)
     1.0 / (1.0 + math.exp(margin))
   }
+
+  override def equals(other: MLModel): Boolean = {
+    if(other.isInstanceOf[LrModel]) {
+      val otherModel = other.asInstanceOf[LrModel]
+      if (paramMeta.toJSON(params).equals(otherModel.paramMeta.toJSON(otherModel.params))
+        && coeffs.equals(otherModel.coeffs)) true else false
+    } else false
+  }
 }
 
 object LrModel extends Logging {

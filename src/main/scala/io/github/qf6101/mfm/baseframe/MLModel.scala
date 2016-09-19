@@ -12,6 +12,8 @@ abstract class MLModel(val paramMeta: ModelParam,
     coeffs.save(location + "/" + MLModel.namingCoeffFile)
     paramMeta.save(location + "/" + MLModel.namingParamFile, params)
   }
+
+  def equals(other: MLModel): Boolean
 }
 
 object MLModel {

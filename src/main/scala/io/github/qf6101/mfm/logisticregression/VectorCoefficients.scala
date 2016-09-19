@@ -225,7 +225,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
     * @param location 文件位置
     */
   override def saveMeta(location: String): Unit = {
-    val json = (Coefficients.namingCoeffType -> this.getClass.toString) ~
+    val json = (Coefficients.namingCoeffType -> VectorCoefficients.getClass.toString) ~
       (VectorCoefficients.namingFeatureSize -> size) ~
       (VectorCoefficients.namingIntercept -> w0) ~
       (VectorCoefficients.namingWSize -> w.size)
@@ -240,6 +240,19 @@ class VectorCoefficients(val size: Int) extends Coefficients {
     */
   override def saveData(location: String): Unit = {
     SparkSession.builder().getOrCreate().createDataFrame(w.toSeq).toDF("index", "value").write.parquet(location)
+  }
+
+  /**
+    * 与另一个系数是否相等
+    *
+    * @param other 另一个系数
+    * @return 是否相等
+    */
+  override def equals(other: Coefficients): Boolean = {
+    if(other.isInstanceOf[VectorCoefficients]) {
+      val otherCoeffs = other.asInstanceOf[VectorCoefficients]
+      if(w0 == otherCoeffs.w0 && w.equals(otherCoeffs.w)) true else false
+    } else false
   }
 }
 

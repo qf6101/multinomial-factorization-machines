@@ -32,7 +32,7 @@ trait FmModelParam extends BinModelParam {
     */
   override def toJSON(params: ParamMap): JsonAST.JObject = {
     super.toJSON(params) ~
-      (ModelParam.namingParamType -> this.getClass.toString()) ~
+      (ModelParam.namingParamType -> FmModelParam.getClass.toString) ~
       (reg0.name -> params(reg0)) ~
       (reg1.name -> params(reg1)) ~
       (reg2.name -> params(reg2)) ~

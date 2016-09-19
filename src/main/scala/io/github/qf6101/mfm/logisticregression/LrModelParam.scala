@@ -25,7 +25,7 @@ trait LrModelParam extends BinModelParam {
     */
   override def toJSON(params: ParamMap): JsonAST.JObject = {
     super.toJSON(params) ~
-      (ModelParam.namingParamType -> this.getClass.toString) ~
+      (ModelParam.namingParamType -> LrModelParam.getClass.toString) ~
       (reg.name -> params(reg).mkString(", "))
   }
 }
