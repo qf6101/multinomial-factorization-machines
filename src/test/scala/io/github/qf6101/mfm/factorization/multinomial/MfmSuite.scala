@@ -37,7 +37,7 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     params.put(mfmLearn.reg1, 0.01)
     params.put(mfmLearn.reg2, 0.01)
     params.put(mfmLearn.numClasses, 10)
-    // Train FM model
+    // Train MFM model
     val model = mfmLearn.train(training)
     // Use testing data set to evaluate the model
     val eval = testing.map { case (label, features) =>
@@ -47,7 +47,7 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     // Save model to file
     HDFSUtil.deleteIfExists("test_data/output/mnist")
     model.save("test_data/output/mnist")
-    // Reload model from file and test if it is equal from the original model
+    // Reload model from file and test if it is equal to the original model
     val reloadModel = MfmModel("test_data/output/mnist")
     assert(model.equals(reloadModel))
     // Evaluate the reloaded model
