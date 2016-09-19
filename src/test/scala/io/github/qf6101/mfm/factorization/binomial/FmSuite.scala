@@ -45,7 +45,7 @@ class FmSuite extends FunSuite with MfmTestSparkSession {
     // Save model to file
     HDFSUtil.deleteIfExists("test_data/output/a1a")
     model.save("test_data/output/a1a")
-    // Reload model from file and test if it is equal from the original model
+    // Reload model from file and test if it is equal to the original model
     val reloadModel = FmModel("test_data/output/a1a")
     assert(model.equals(reloadModel))
     // Evaluate the reloaded model
