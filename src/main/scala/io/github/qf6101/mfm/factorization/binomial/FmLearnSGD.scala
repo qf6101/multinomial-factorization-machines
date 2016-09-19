@@ -13,8 +13,8 @@ import org.apache.spark.rdd.RDD
 
 /**
   * FM模型的SGD学习器
- *
-  * @param params 参数池
+  *
+  * @param params  参数池
   * @param updater 模型参数更新器
   */
 class FmLearnSGD(override val params: ParamMap,
@@ -25,7 +25,7 @@ class FmLearnSGD(override val params: ParamMap,
 
   /**
     * 训练模型
- *
+    *
     * @param dataset 训练集
     * @return 模型
     */

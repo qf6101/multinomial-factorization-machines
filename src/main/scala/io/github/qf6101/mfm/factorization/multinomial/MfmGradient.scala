@@ -9,6 +9,13 @@ import org.apache.spark.ml.param.ParamMap
 /**
   * Created by qfeng on 16-9-7.
   */
+
+/**
+  * 多分类FM梯度
+  *
+  * @param paramMeta 多分类FM参数
+  * @param params    参数池
+  */
 class MfmGradient(paramMeta: MfmModelParam, params: ParamMap) extends Gradient with Logging {
   /**
     * Compute the gradient and loss given the features of a single data point,

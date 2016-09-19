@@ -8,9 +8,16 @@ import org.apache.spark.rdd.RDD
 /**
   * Created by qfeng on 16-9-9.
   */
+
+/**
+  * 多分类学习器基类
+  *
+  * @param params 参数池
+  */
 abstract class MultiLearner(override val params: ParamMap) extends MLLearner(params) {
   /**
     * 训练对应模型
+    *
     * @param dataset 训练集
     * @return 模型
     */

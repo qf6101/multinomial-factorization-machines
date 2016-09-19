@@ -3,6 +3,7 @@ package io.github.qf6101.mfm.util
 /**
   * Created by qfeng on 15-3-13.
   */
+
 import org.apache.spark.mllib.linalg.{Matrix, Vector}
 import org.scalatest.exceptions.TestFailedException
 

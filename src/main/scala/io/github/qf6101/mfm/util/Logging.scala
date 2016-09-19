@@ -1,10 +1,14 @@
 package io.github.qf6101.mfm.util
+
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Created by qfeng on 16-8-30.
   */
 
+/**
+  * 日志工具接口
+  */
 trait Logging {
   @transient private var log_ : Logger = null
 
@@ -59,7 +63,7 @@ trait Logging {
     if (log.isErrorEnabled) log.error(msg, throwable)
   }
 
-  protected def isTraceEnabled(): Boolean = {
+  protected def isTraceEnabled: Boolean = {
     log.isTraceEnabled
   }
 }

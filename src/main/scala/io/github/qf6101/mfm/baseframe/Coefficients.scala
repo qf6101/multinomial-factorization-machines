@@ -151,7 +151,7 @@ abstract class Coefficients extends Serializable {
   /**
     * 保存系数至文件
     *
-    * @param location
+    * @param location 文件位置
     */
   def save(location: String): Unit = {
     saveMeta(location + "/" + Coefficients.namingMetaFile)
@@ -181,6 +181,9 @@ abstract class Coefficients extends Serializable {
   def equals(other: Coefficients): Boolean
 }
 
+/**
+  * 静态系数对象
+  */
 object Coefficients {
   val namingCoeffType: String = "coeff_type"
   val namingMetaFile: String = "coeff_meta"

@@ -4,9 +4,7 @@ import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.MLModel
 import io.github.qf6101.mfm.baseframe.binomial.BinModel
 import io.github.qf6101.mfm.util.Logging
-import org.apache.spark.SparkContext
 import org.apache.spark.ml.param.ParamMap
-import sun.reflect.annotation.TypeAnnotation.LocationInfo.Location
 
 /**
   * Created by qfeng on 15-3-16.
@@ -46,11 +44,13 @@ class LrModel(override val paramMeta: LrModelParam,
   }
 
   override def equals(other: MLModel): Boolean = {
-    if(other.isInstanceOf[LrModel]) {
-      val otherModel = other.asInstanceOf[LrModel]
-      if (paramMeta.toJSON(params).equals(otherModel.paramMeta.toJSON(otherModel.params))
-        && coeffs.equals(otherModel.coeffs)) true else false
-    } else false
+    other match {
+      case otherModel: LrModel =>
+        if (paramMeta.toJSON(params).equals(otherModel.paramMeta.toJSON(otherModel.params))
+          && coeffs.equals(otherModel.coeffs)) true
+        else false
+      case _ => false
+    }
   }
 }
 

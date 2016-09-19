@@ -1,8 +1,8 @@
 package io.github.qf6101.mfm.logisticregression
 
 import breeze.linalg.SparseVector
+import io.github.qf6101.mfm.baseframe.MLModel
 import io.github.qf6101.mfm.baseframe.binomial.{BinLearner, BinModel}
-import io.github.qf6101.mfm.baseframe.{MLLearner, MLModel}
 import io.github.qf6101.mfm.optimization.{LBFGS, Updater}
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.rdd.RDD
@@ -14,9 +14,9 @@ import org.apache.spark.storage.StorageLevel
 
 /**
   * 逻辑斯蒂模型的LBFGS学习器
- *
-  * @param params 参数池*
-  * @param updater 参数更新器
+  *
+  * @param params        参数池*
+  * @param updater       参数更新器
   * @param initialCoeffs 初始参数
   */
 class LrLearnLBFGS(override val params: ParamMap,
@@ -28,7 +28,7 @@ class LrLearnLBFGS(override val params: ParamMap,
 
   /**
     * 训练逻辑斯蒂模型
- *
+    *
     * @param dataSet 训练集
     * @return 逻辑斯蒂模型
     */
@@ -52,9 +52,9 @@ object LrLearnLBFGS {
   /**
     * 训练逻辑斯蒂模型
     *
-    * @param dataset 数据集
-    * @param params 参数池*
-    * @param updater 参数更新器
+    * @param dataset       数据集
+    * @param params        参数池*
+    * @param updater       参数更新器
     * @param initialCoeffs 初始参数
     * @return 逻辑斯蒂模型
     */

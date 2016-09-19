@@ -8,15 +8,31 @@ import io.github.qf6101.mfm.util.Logging
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.rdd.RDD
 
-import scala.collection.mutable.{ArrayBuffer, HashMap}
+import scala.collection.mutable
+import scala.language.implicitConversions
 
 /**
   * Created by qfeng on 15-4-7.
   */
 
-
+/**
+  * LBFGS优化器
+  *
+  * @param gradient 梯度逻辑
+  * @param updater  更新逻辑
+  * @param params   参数池
+  */
 class LBFGS(private var gradient: Gradient, private var updater: Updater, private var params: ParamMap) extends
-Optimizer with LBFGSParam with Logging {
+  Optimizer with LBFGSParam with Logging {
+
+  /**
+    * 最优化函数
+    *
+    * @param data          样本数据集
+    * @param initialCoeffs 初始化系数值
+    * @param reg           正则参数值
+    * @return 学习后的参数
+    */
   override def optimize(data: RDD[(Double, SparseVector[Double])],
                         initialCoeffs: Coefficients,
                         reg: Array[Double]):
@@ -25,6 +41,14 @@ Optimizer with LBFGSParam with Logging {
     coeffs
   }
 
+  /**
+    * 最优化函数
+    *
+    * @param data          样本数据集
+    * @param initialCoeffs 初始化系数值
+    * @param reg           正则参数值
+    * @return 学习后的参数
+    */
   def optimizeWithHistory(data: RDD[(Double, SparseVector[Double])],
                           initialCoeffs: Coefficients,
                           reg: Array[Double],
@@ -35,7 +59,7 @@ Optimizer with LBFGSParam with Logging {
     val numCorrectionsValue = params(numCorrections)
     val convergenceTolValue = params(convergenceTol)
     //初始化损失值数组、数据集大小
-    val lossHistory = new ArrayBuffer[Double](numIterationsValue)
+    val lossHistory = new mutable.ArrayBuffer[Double](numIterationsValue)
     val numExamples = data.count()
     //初始化系数、损失函数形式
     val vecInitialCoeffs = initialCoeffs.asInstanceOf[VectorCoefficients]
@@ -48,7 +72,7 @@ Optimizer with LBFGSParam with Logging {
     var state = states.next()
     while (states.hasNext) {
       i += 1
-      logDebug(s"Iteration ($i/${numIterationsValue}) loss: ${state.value}")
+      logDebug(s"Iteration ($i/$numIterationsValue) loss: ${state.value}")
       lossHistory.append(state.value)
       state = states.next()
     }
@@ -80,7 +104,7 @@ Optimizer with LBFGSParam with Logging {
     */
   implicit def BSVToVC(in: SparseVector[Double]): VectorCoefficients = {
     val w0 = in(0)
-    val w = HashMap[Int, Double]()
+    val w = mutable.HashMap[Int, Double]()
     in.activeIterator.foreach { case (index, value) =>
       if (index != 0) {
         w += (index - 1) -> value
@@ -124,7 +148,7 @@ Optimizer with LBFGSParam with Logging {
         * for other updater, the same logic is followed.
         */
       val regVal = updater.compute(w, new VectorCoefficients(n - 1), 0, 1, reg)._2
-      val loss = lossSum / numExamples + regVal
+      val outputLoss = lossSum / numExamples + regVal
       /**
         * It will return the gradient part of regularization using updater.
         *
@@ -146,7 +170,8 @@ Optimizer with LBFGSParam with Logging {
       gradientTotal -= updater.compute(w, new VectorCoefficients(n - 1), 1, 1, reg)._1.asInstanceOf[VectorCoefficients]
       gradientTotal += gradientSum * (1.0 / numExamples)
 
-      (loss, gradientTotal)
+      (outputLoss, gradientTotal)
     }
   }
+
 }

@@ -16,6 +16,8 @@ import scala.math._
 /**
   * Factorization Machine模型系数
   *
+  * @param initMean    随机初始值均值
+  * @param initStdev   随机初始值标准差
   * @param numFeatures 特征个数
   * @param numFactors  因子个数
   * @param k0          是否需要处理截距
@@ -290,13 +292,17 @@ class FmCoefficients(val initMean: Double,
     * @return 是否相等
     */
   override def equals(other: Coefficients): Boolean = {
-    if(other.isInstanceOf[FmCoefficients]) {
-      val otherCoeffs = other.asInstanceOf[FmCoefficients]
-      if(w0 == otherCoeffs.w0 && w.equals(otherCoeffs.w) && v.equals(otherCoeffs.v)) true else false
-    } else false
+    other match {
+      case otherCoeffs: FmCoefficients =>
+        if (w0 == otherCoeffs.w0 && w.equals(otherCoeffs.w) && v.equals(otherCoeffs.v)) true else false
+      case _ => false
+    }
   }
 }
 
+/**
+  * 静态FM系数对象
+  */
 object FmCoefficients {
   val namingIntercept = "intercept"
   val namingWSize = "w_size"
@@ -313,8 +319,10 @@ object FmCoefficients {
     * @return 分解机系数
     */
   def apply(location: String): FmCoefficients = {
+    //初始化spark session
     val spark = SparkSession.builder().getOrCreate()
     import spark.implicits._
+    //读取元数据
     val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
     val w0 = meta.getAs[Double](namingIntercept)
     val vRows = meta.getAs[Long](namingVRows).toInt
@@ -322,9 +330,11 @@ object FmCoefficients {
     val k0 = meta.getAs[Boolean](namingK0)
     val k1 = meta.getAs[Boolean](namingK1)
     val k2 = meta.getAs[Boolean](namingK2)
+    // 读取w向量
     val w = DenseVector(spark.read.parquet(location + "/" + Coefficients.namingDataFile + "/w").map { row =>
       row.getAs[Double]("value")
     }.collect())
+    // 读取v向量
     val v = DenseMatrix.create(vRows, vCols, spark.read.parquet(location + "/" + Coefficients.namingDataFile + "/v")
       .map { row =>
         row.getAs[Double]("value")

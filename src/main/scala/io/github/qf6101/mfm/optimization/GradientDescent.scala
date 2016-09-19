@@ -13,9 +13,24 @@ import scala.collection.mutable.ArrayBuffer
   * Created by qfeng on 15-3-11.
   */
 
+/**
+  * 随机梯度下降器
+  *
+  * @param gradient 梯度逻辑
+  * @param updater  更新逻辑
+  * @param params   参数池
+  */
 class GradientDescent(private var gradient: Gradient, private var updater: Updater, private var params: ParamMap)
   extends Optimizer with SGDParam with Logging {
 
+  /**
+    * 最优化函数
+    *
+    * @param data          样本数据集
+    * @param initialCoeffs 初始化系数值
+    * @param regParam      正则参数值
+    * @return 学习后的参数
+    */
   override def optimize(data: RDD[(Double, SparseVector[Double])],
                         initialCoeffs: Coefficients,
                         regParam: Array[Double]): Coefficients = {
@@ -23,6 +38,14 @@ class GradientDescent(private var gradient: Gradient, private var updater: Updat
     coeffs
   }
 
+  /**
+    * 最优化函数
+    *
+    * @param data          样本数据集
+    * @param initialCoeffs 初始化系数值
+    * @param regParam      正则参数值
+    * @return 学习后的参数
+    */
   def optimizeWithHistory(data: RDD[(Double, SparseVector[Double])],
                           initialCoeffs: Coefficients,
                           regParam: Array[Double]): (Coefficients, Array[Double]) = {
@@ -41,7 +64,7 @@ class GradientDescent(private var gradient: Gradient, private var updater: Updat
     while (!reachStopCondition && i < numIterationsValue) {
       i += 1
       val bcCoeffs = SparkContext.getOrCreate.broadcast(coeffs)
-      val (gradientSum, lossSum, miniBatchSize) = data.sample(false, miniBatchFractionValue, 42 + i)
+      val (gradientSum, lossSum, miniBatchSize) = data.sample(withReplacement = false, miniBatchFractionValue, 42 + i)
         .treeAggregate(initialCoeffs.copyEmpty(), 0.0, 0L)(
           seqOp = (c, v) => {
             // c: (grad, loss, count), v: (label, features)
@@ -64,7 +87,7 @@ class GradientDescent(private var gradient: Gradient, private var updater: Updat
         coeffs = update._1
         regVal = update._2
         //打印调试信息：损失值
-        logInfo(s"Iteration ($i/${numIterationsValue}) loss: ${lossSum / miniBatchSize} and ${regVal}, solutionDiff: ${solutionDiff}")
+        logInfo(s"Iteration ($i/$numIterationsValue) loss: ${lossSum / miniBatchSize} and $regVal, solutionDiff: $solutionDiff")
       } else {
         logWarning(s"Iteration ($i/$numIterationsValue}). The size of sampled batch is zero")
       }

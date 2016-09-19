@@ -15,8 +15,9 @@ import breeze.linalg.{DenseMatrix, DenseVector}
 object GaussianRandom {
   /**
     * 生成高斯随机数密向量
-    * @param mean 高斯分布的均值
-    * @param stdev 高斯分布的标准差
+    *
+    * @param mean   高斯分布的均值
+    * @param stdev  高斯分布的标准差
     * @param length 向量长度
     * @return 高斯随机数密向量
     */
@@ -30,8 +31,9 @@ object GaussianRandom {
 
   /**
     * 生成告诉随机数密矩阵
-    * @param mean 高斯分布的均值
-    * @param stdev 高斯分布的标准差
+    *
+    * @param mean    高斯分布的均值
+    * @param stdev   高斯分布的标准差
     * @param numRows 矩阵行数
     * @param numCols 矩阵列数
     * @return 高斯随机数密矩阵
@@ -46,7 +48,8 @@ object GaussianRandom {
 
   /**
     * 生成高斯随机数
-    * @param mean 高斯分布的均值
+    *
+    * @param mean  高斯分布的均值
     * @param stdev 高斯分布的标准差
     * @return 高斯随机数
     */

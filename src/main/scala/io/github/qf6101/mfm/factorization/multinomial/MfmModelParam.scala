@@ -5,14 +5,17 @@ import io.github.qf6101.mfm.baseframe.mutinomial.MultiModelParam
 import io.github.qf6101.mfm.factorization.binomial.FmModelParam
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 import org.apache.spark.sql.SparkSession
-import org.json4s.{JObject, JsonAST}
 import org.json4s.JsonAST.JField
 import org.json4s.JsonDSL._
-
+import org.json4s.{JObject, JsonAST}
 
 
 /**
   * Created by qfeng on 16-9-7.
+  */
+
+/**
+  * 多分类FM模型参数
   */
 trait MfmModelParam extends FmModelParam with MultiModelParam {
   val numClasses: Param[Int] = new Param("MfmModelParam", "numClasses", "标签数目", ParamValidators.gt(0))
@@ -42,8 +45,10 @@ object MfmModelParam {
     * @return 分解机型参数
     */
   def apply(location: String, params: ParamMap): MfmModelParam = {
+    // 初始化参数对象和spark session
     val mfmModelParam = new MfmModelParam {}
     val spark = SparkSession.builder().getOrCreate()
+    // 读取参数值
     val paramValues = spark.read.json(location).first()
     val binaryThreshold = paramValues.getAs[Double](mfmModelParam.binaryThreshold.name)
     val reg0 = paramValues.getAs[Double](mfmModelParam.reg0.name)
@@ -58,6 +63,7 @@ object MfmModelParam {
     val initStdev = paramValues.getAs[Double](mfmModelParam.initStdev.name)
     val maxInteractFeatures = paramValues.getAs[Long](mfmModelParam.maxInteractFeatures.name).toInt
     val numClasses = paramValues.getAs[Long](mfmModelParam.numClasses.name).toInt
+    // 设置参数值
     params.put(mfmModelParam.binaryThreshold, binaryThreshold)
     params.put(mfmModelParam.reg0, reg0)
     params.put(mfmModelParam.reg1, reg1)
@@ -71,6 +77,7 @@ object MfmModelParam {
     params.put(mfmModelParam.initStdev, initStdev)
     params.put(mfmModelParam.maxInteractFeatures, maxInteractFeatures)
     params.put(mfmModelParam.numClasses, numClasses)
+    // 返回MFM参数
     mfmModelParam
   }
 }

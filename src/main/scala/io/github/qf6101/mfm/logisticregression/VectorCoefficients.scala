@@ -6,7 +6,7 @@ import org.apache.spark.sql.SparkSession
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
-import scala.collection.mutable.HashMap
+import scala.collection.mutable
 import scala.math._
 
 /**
@@ -14,7 +14,7 @@ import scala.math._
   */
 class VectorCoefficients(val size: Int) extends Coefficients {
   var w0 = 0.0
-  var w = HashMap[Int, Double]()
+  var w = mutable.HashMap[Int, Double]()
 
   /**
     * 同时复制this的结构和内容
@@ -31,7 +31,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
     * @param w0 截距
     * @param w  Map稀疏向量表示的参数
     */
-  def this(size: Int, w0: Double, w: HashMap[Int, Double]) {
+  def this(size: Int, w0: Double, w: mutable.HashMap[Int, Double]) {
     this(size)
     this.w0 = w0
     this.w ++= w
@@ -213,7 +213,7 @@ class VectorCoefficients(val size: Int) extends Coefficients {
     *
     * @return 系数的2范数
     */
-  override def norm(): Double = {
+  override def norm: Double = {
     math.sqrt(w.foldLeft(0.0) { case (sum: Double, (_, value: Double)) =>
       sum + value * value
     } + w0 * w0)
@@ -249,14 +249,17 @@ class VectorCoefficients(val size: Int) extends Coefficients {
     * @return 是否相等
     */
   override def equals(other: Coefficients): Boolean = {
-    if(other.isInstanceOf[VectorCoefficients]) {
-      val otherCoeffs = other.asInstanceOf[VectorCoefficients]
-      if(w0 == otherCoeffs.w0 && w.equals(otherCoeffs.w)) true else false
-    } else false
+    other match {
+      case otherCoeffs: VectorCoefficients =>
+        if (w0 == otherCoeffs.w0 && w.equals(otherCoeffs.w)) true else false
+      case _ => false
+    }
   }
 }
 
-
+/**
+  * 向量化系数对象
+  */
 object VectorCoefficients {
   val namingIntercept = "intercept"
   val namingFeatureSize = "feature_size"
@@ -277,6 +280,6 @@ object VectorCoefficients {
     val w = spark.read.parquet(location + "/" + Coefficients.namingDataFile).map { row =>
       (row.getAs[Long]("index").toInt, row.getAs[Double]("value"))
     }.collect()
-    new VectorCoefficients(size, w0, HashMap[Int, Double](w.toSeq: _*))
+    new VectorCoefficients(size, w0, mutable.HashMap[Int, Double](w.toSeq: _*))
   }
 }

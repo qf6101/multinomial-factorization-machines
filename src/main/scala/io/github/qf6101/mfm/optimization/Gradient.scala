@@ -11,10 +11,9 @@ trait Gradient extends Serializable {
   /**
     * Compute the gradient and loss given the features of a single data point.
     *
-    * @param data features for one data point
-    * @param label label for this data point
+    * @param data   features for one data point
+    * @param label  label for this data point
     * @param coeffs weights/coefficients corresponding to features
-    *
     * @return (gradient: Coefficients, loss: Double)
     */
   def compute(data: SparseVector[Double],
@@ -29,11 +28,10 @@ trait Gradient extends Serializable {
     * Compute the gradient and loss given the features of a single data point,
     * add the gradient to a provided vector to avoid creating new objects, and return loss.
     *
-    * @param data features for one data point
-    * @param label label for this data point
-    * @param coeffs weights/coefficients corresponding to features
+    * @param data        features for one data point
+    * @param label       label for this data point
+    * @param coeffs      weights/coefficients corresponding to features
     * @param cumGradient the computed gradient will be added to this vector
-    *
     * @return loss
     */
   def compute(data: SparseVector[Double],

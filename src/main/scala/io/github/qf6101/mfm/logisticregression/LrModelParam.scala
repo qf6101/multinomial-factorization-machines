@@ -39,17 +39,21 @@ object LrModelParam {
     * @return 逻辑斯蒂模型参数
     */
   def apply(location: String, params: ParamMap): LrModelParam = {
+    // 初始化参数对象和spark session
     val lrModelParam = new LrModelParam {}
     val spark = SparkSession.builder().getOrCreate()
+    // 读取参数值
     val paramValues = spark.read.json(location).first()
     val binaryThreshold = paramValues.getAs[Double](lrModelParam.binaryThreshold.name)
     val reg = paramValues.getAs[String](lrModelParam.reg.name).split(",").map(_.trim.toDouble)
     val initMean = paramValues.getAs[Double](lrModelParam.initMean.name)
     val initStdev = paramValues.getAs[Double](lrModelParam.initStdev.name)
+    // 设置参数值
     params.put(lrModelParam.binaryThreshold, binaryThreshold)
     params.put(lrModelParam.reg, reg)
     params.put(lrModelParam.initMean, initMean)
     params.put(lrModelParam.initStdev, initStdev)
+    // 返回LR模型参数
     lrModelParam
   }
 }

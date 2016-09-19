@@ -121,7 +121,7 @@ class LBFGSSuite extends FunSuite with MfmTestSparkSession {
 
     assert(
       (weightLBFGS.asInstanceOf[VectorCoefficients].w0 ~= weightGD.asInstanceOf[VectorCoefficients].w0 relTol 0.03)
-      && (weightLBFGS.asInstanceOf[VectorCoefficients].w(0) ~= weightGD.asInstanceOf[VectorCoefficients].w(0) relTol 0.03)
+        && (weightLBFGS.asInstanceOf[VectorCoefficients].w(0) ~= weightGD.asInstanceOf[VectorCoefficients].w(0) relTol 0.03)
         && (weightLBFGS.asInstanceOf[VectorCoefficients].w(1) ~= weightGD.asInstanceOf[VectorCoefficients].w(1) relTol 0.03),
       "The weight differences between LBFGS and GD should be within 3%.")
   }

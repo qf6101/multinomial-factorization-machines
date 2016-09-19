@@ -54,8 +54,10 @@ object FmModelParam {
     * @return 分解机型参数
     */
   def apply(location: String, params: ParamMap): FmModelParam = {
+    // 初始化参数对象和spark session
     val fmModelParam = new FmModelParam {}
     val spark = SparkSession.builder().getOrCreate()
+    // 读取参数值
     val paramValues = spark.read.json(location).first()
     val binaryThreshold = paramValues.getAs[Double](fmModelParam.binaryThreshold.name)
     val reg0 = paramValues.getAs[Double](fmModelParam.reg0.name)
@@ -69,6 +71,7 @@ object FmModelParam {
     val initMean = paramValues.getAs[Double](fmModelParam.initMean.name)
     val initStdev = paramValues.getAs[Double](fmModelParam.initStdev.name)
     val maxInteractFeatures = paramValues.getAs[Long](fmModelParam.maxInteractFeatures.name).toInt
+    // 设置参数值
     params.put(fmModelParam.binaryThreshold, binaryThreshold)
     params.put(fmModelParam.reg0, reg0)
     params.put(fmModelParam.reg1, reg1)
@@ -81,6 +84,7 @@ object FmModelParam {
     params.put(fmModelParam.initMean, initMean)
     params.put(fmModelParam.initStdev, initStdev)
     params.put(fmModelParam.maxInteractFeatures, maxInteractFeatures)
+    // 返回FM参数
     fmModelParam
   }
 }

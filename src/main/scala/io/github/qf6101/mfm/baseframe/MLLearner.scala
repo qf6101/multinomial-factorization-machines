@@ -5,6 +5,12 @@ import org.apache.spark.ml.param.ParamMap
 /**
   * Created by qfeng on 16-9-9.
   */
+
+/**
+  * 学习器基类
+  *
+  * @param params 参数池
+  */
 abstract class MLLearner(val params: ParamMap) extends Serializable {
   /**
     * 更新参数池

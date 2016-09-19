@@ -10,10 +10,17 @@ import org.apache.spark.storage.StorageLevel
   * Usage: Binary classification evaluation, See https://en.wikipedia.org/wiki/Receiver_operating_characteristic
   */
 
+/**
+  * 二分类指标
+  *
+  * @param rawScoreAndLabels 预测值和标签
+  * @param threshold         二分类阈值(默认0.5)
+  */
 class BinaryClassificationMetrics(private val rawScoreAndLabels: RDD[(Double, Double)],
                                   val threshold: Double = 0.5) extends Serializable {
-  private val scoreAndLabels = rawScoreAndLabels.map { case(score, label) =>
-    if(label <= 0) (score, 0.0) else (score, 1.0)
+  // 假如标签为1/-1,将其转换为1/0
+  private val scoreAndLabels = rawScoreAndLabels.map { case (score, label) =>
+    if (label <= 0) (score, 0.0) else (score, 1.0)
   }.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
   private val metrics = computeMetrics
@@ -67,7 +74,7 @@ class BinaryClassificationMetrics(private val rawScoreAndLabels: RDD[(Double, Do
     } else {
       auc = new BCM(scoreAndLabels).areaUnderROC()
     }
-    if(scoreAndLabels.getStorageLevel == StorageLevel.MEMORY_AND_DISK_SER) {
+    if (scoreAndLabels.getStorageLevel == StorageLevel.MEMORY_AND_DISK_SER) {
       scoreAndLabels.unpersist()
     }
     auc
@@ -80,25 +87,25 @@ class BinaryClassificationMetrics(private val rawScoreAndLabels: RDD[(Double, Do
     */
   private def computeMetrics: (Double, Double, Double, Double, Double, Double, Double, Int) = {
     val sc = scoreAndLabels.context
-    val totalAccum = sc.accumulator(0)
-    val testPositiveAccum = sc.accumulator(0)
-    val condPositiveAccum = sc.accumulator(0)
-    val truePositiveAccum = sc.accumulator(0)
-    val trueNegativeAccum = sc.accumulator(0)
+    val totalAccum = sc.longAccumulator
+    val testPositiveAccum = sc.longAccumulator
+    val condPositiveAccum = sc.longAccumulator
+    val truePositiveAccum = sc.longAccumulator
+    val trueNegativeAccum = sc.longAccumulator
 
     scoreAndLabels.foreach { case (score, label) =>
-      totalAccum += 1
+      totalAccum.add(1)
       if (score > threshold) {
-        testPositiveAccum += 1
+        testPositiveAccum.add(1)
       }
       if (label == 1.0) {
-        condPositiveAccum += 1
+        condPositiveAccum.add(1)
       }
       if (score >= threshold && label == 1.0) {
-        truePositiveAccum += 1
+        truePositiveAccum.add(1)
       }
       if (score < threshold && label == 0.0) {
-        trueNegativeAccum += 1
+        trueNegativeAccum.add(1)
       }
     }
 

@@ -15,7 +15,7 @@ import scala.util.control.Breaks
   */
 
 /**
-  * 预测模型基类
+  * 二分模型基类
   *
   * @param paramMeta 模型参赛
   * @param coeffs    模型系数

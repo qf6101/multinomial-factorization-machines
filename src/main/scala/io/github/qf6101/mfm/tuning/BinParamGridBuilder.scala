@@ -11,6 +11,9 @@ import scala.util.Random
   * Usage: 快速模型选择时，参数的构建工具类
   */
 
+/**
+  * 快速模型选择时，参数的构建工具类(针对二分模型)
+  */
 class BinParamGridBuilder extends Serializable {
   val paramGrid = mutable.Map.empty[Param[_], Iterable[_]]
 

@@ -16,9 +16,8 @@ abstract class Updater(private val decreasingStrategy: DecreasingStrategy)
     * @param coeffOld - Old coefficients.
     * @param gradient - Average batch gradient.
     * @param stepSize - step size across iterations
-    * @param iter - Iteration number
+    * @param iter     - Iteration number
     * @param regParam - Regularization parameter
-    *
     * @return A tuple of 2 elements. The first element is a coefficient structure containing updated weights,
     *         and the second element is the regularization value computed using updated weights.
     */
@@ -34,7 +33,7 @@ abstract class Updater(private val decreasingStrategy: DecreasingStrategy)
   * Uses a step-size decreasing with the square root of the number of iterations.
   */
 class SimpleUpdater(private val decreasingStrategy: DecreasingStrategy = new sqrtDecreasingStrategy())
-extends Updater(decreasingStrategy) {
+  extends Updater(decreasingStrategy) {
   /**
     * Compute an updated value for weights given the gradient, stepSize, iteration number and
     * regularization parameter. Also returns the regularization value regParam * R(w)
@@ -43,9 +42,8 @@ extends Updater(decreasingStrategy) {
     * @param coeffOld - Old coefficients.
     * @param gradient - Average batch gradient.
     * @param stepSize - step size across iterations
-    * @param iter - Iteration number
+    * @param iter     - Iteration number
     * @param regParam - Regularization parameter
-    *
     * @return A tuple of 2 elements. The first element is a coefficient structure containing updated weights,
     *         and the second element is the regularization value computed using updated weights.
     */
@@ -62,9 +60,9 @@ extends Updater(decreasingStrategy) {
 
 /**
   * Updater for L2 regularized problems.
-  * R(w) = 1/2 ||w||^2
+  * R(w) = 1/2 ||w||2
   * Uses a step-size decreasing with the square root of the number of iterations.
-  */
+  **/
 class SquaredL2Updater(private val decreasingStrategy: DecreasingStrategy = new sqrtDecreasingStrategy())
   extends Updater(decreasingStrategy) {
   /**
@@ -75,9 +73,8 @@ class SquaredL2Updater(private val decreasingStrategy: DecreasingStrategy = new 
     * @param coeffOld - Old coefficients.
     * @param gradient - Average batch gradient.
     * @param stepSize - step size across iterations
-    * @param iter - Iteration number
+    * @param iter     - Iteration number
     * @param regParam - Regularization parameter
-    *
     * @return A tuple of 2 elements. The first element is a coefficient structure containing updated weights,
     *         and the second element is the regularization value computed using updated weights.
     */
@@ -100,7 +97,7 @@ class SquaredL2Updater(private val decreasingStrategy: DecreasingStrategy = new 
   * Updater for L1 regularized problems.
   * R(w) = ||w||_1
   * Uses a step-size decreasing with the square root of the number of iterations.
-
+  *
   * Instead of subgradient of the regularizer, the proximal operator for the
   * L1 regularization is applied after the gradient step. This is known to
   * result in better sparsity of the intermediate solution.
@@ -124,9 +121,8 @@ class L1Updater(private val decreasingStrategy: DecreasingStrategy = new sqrtDec
     * @param coeffOld - Old coefficients.
     * @param gradient - Average batch gradient.
     * @param stepSize - step size across iterations
-    * @param iter - Iteration number
+    * @param iter     - Iteration number
     * @param regParam - Regularization parameter
-    *
     * @return A tuple of 2 elements. The first element is a coefficient structure containing updated weights,
     *         and the second element is the regularization value computed using updated weights.
     */

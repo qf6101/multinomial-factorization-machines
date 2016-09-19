@@ -9,6 +9,19 @@ import org.json4s.jackson.JsonMethods._
 /**
   * Created by qfeng on 16-9-7.
   */
+
+/**
+  * Multinomial Factorization Machine模型系数
+  *
+  * @param initMean    随机初始值均值
+  * @param initStdev   随机初始值标准差
+  * @param numFeatures 特征个数
+  * @param numFactors  因子个数
+  * @param k0          是否需要处理截距
+  * @param k1          是否需要处理一阶参数
+  * @param k2          是否需要处理二阶参数
+  * @param numClasses  标签个数
+  */
 class MfmCoefficients(val initMean: Double,
                       val initStdev: Double,
                       var numFeatures: Int,
@@ -18,9 +31,15 @@ class MfmCoefficients(val initMean: Double,
                       val k1: Boolean,
                       val k2: Boolean,
                       val numClasses: Int) extends Coefficients {
+  // 每个标签对应一个FM系数
   var thetas = Array.fill[FmCoefficients](numClasses)(new FmCoefficients(
     initMean, initStdev, numFeatures, numInteractFeatures, numFactors, k0, k1, k2))
 
+  /**
+    * 从FM系数数组构造多分类模型系数
+    *
+    * @param thetas FM系数数组
+    */
   def this(thetas: Array[FmCoefficients]) {
     this(thetas(0).initMean, thetas(0).initStdev, thetas(0).numFeatures, thetas(0).numInteractFeatures,
       thetas(0).numFactors, thetas(0).k0, thetas(0).k1, thetas(0).k2, thetas.length)
@@ -43,8 +62,8 @@ class MfmCoefficients(val initMean: Double,
     */
   override def +=(other: Coefficients): Coefficients = {
     val otherCoeffs = other.asInstanceOf[MfmCoefficients]
-    (this.thetas zip otherCoeffs.thetas).foreach { case (me, other) =>
-      me += other
+    (this.thetas zip otherCoeffs.thetas).foreach { case (me, he) =>
+      me += he
     }
     this
   }
@@ -57,8 +76,8 @@ class MfmCoefficients(val initMean: Double,
     */
   override def -=(other: Coefficients): Coefficients = {
     val otherCoeffs = other.asInstanceOf[MfmCoefficients]
-    (this.thetas zip otherCoeffs.thetas).foreach { case (me, other) =>
-      me -= other
+    (this.thetas zip otherCoeffs.thetas).foreach { case (me, he) =>
+      me -= he
     }
     this
   }
@@ -111,7 +130,11 @@ class MfmCoefficients(val initMean: Double,
     * @param regParam 正则参数
     * @return 参数绝对值加权后的L1正则值
     */
-  override def L1RegValue(regParam: Array[Double]): Double = ???
+  override def L1RegValue(regParam: Array[Double]): Double = {
+    thetas.map { theta =>
+      theta.L1RegValue(regParam)
+    }.sum
+  }
 
 
   /**
@@ -205,26 +228,40 @@ class MfmCoefficients(val initMean: Double,
     * @return 是否相等
     */
   override def equals(other: Coefficients): Boolean = {
-    if(other.isInstanceOf[MfmCoefficients]) {
-      val otherCoeffs = other.asInstanceOf[MfmCoefficients]
-      (thetas zip otherCoeffs.thetas).foldLeft(true) { case (eq, (me, he)) =>
-        eq && me.equals(he)
-      }
-    } else false
+    other match {
+      case otherCoeffs: MfmCoefficients =>
+        (thetas zip otherCoeffs.thetas).foldLeft(true) { case (eq, (me, he)) =>
+          eq && me.equals(he)
+        }
+      case _ => false
+    }
   }
 }
 
+/**
+  * 多分类FM系数对象
+  */
 object MfmCoefficients {
   val namingNumClasses = "num_classes"
 
+  /**
+    * 从文件构造多分类FM系数对象
+    *
+    * @param location 文件位置
+    * @return 多分类FM系数对象
+    */
   def apply(location: String): MfmCoefficients = {
+    // 初始化spark session
     val spark = SparkSession.builder().getOrCreate()
+    // 读取元数据
     val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
     val numClasses = meta.getAs[Long](namingNumClasses).toInt
+    // 读取系数
     val thetas = Array.fill[FmCoefficients](numClasses)(null)
     for (index <- 0 until numClasses) {
       thetas(index) = FmCoefficients(location + "/" + Coefficients.namingDataFile + "/" + index)
     }
+    // 返回结果
     new MfmCoefficients(thetas)
   }
 }

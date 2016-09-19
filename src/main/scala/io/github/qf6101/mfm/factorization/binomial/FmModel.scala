@@ -32,16 +32,33 @@ class FmModel(override val paramMeta: FmModelParam,
     1.0 / (1.0 + math.exp(-score))
   }
 
+  /**
+    * 模型内容是否相同
+    *
+    * @param other 另一个模型
+    * @return 内容是否相同
+    */
   override def equals(other: MLModel): Boolean = {
-    if (other.isInstanceOf[FmModel]) {
-      val otherModel = other.asInstanceOf[FmModel]
-      if (paramMeta.toJSON(params).equals(otherModel.paramMeta.toJSON(otherModel.params))
-        && coeffs.equals(otherModel.coeffs)) true else false
-    } else false
+    other match {
+      case otherModel: FmModel =>
+        if (paramMeta.toJSON(params).equals(otherModel.paramMeta.toJSON(otherModel.params))
+          && coeffs.equals(otherModel.coeffs)) true
+        else false
+      case _ => false
+    }
   }
 }
 
 object FmModel extends Logging {
+  /**
+    * 计算样本的线性得分值
+    *
+    * @param data      样本
+    * @param paramMeta 参数元数据
+    * @param params    参数池
+    * @param coeffs    FM系数
+    * @return 输入样本的线性得分值
+    */
   def linearScore(data: SparseVector[Double],
                   paramMeta: FmModelParam,
                   params: ParamMap,

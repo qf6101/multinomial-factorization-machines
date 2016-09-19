@@ -18,7 +18,7 @@ object LoadDSUtil {
   def loadLibSVMDataSet(path: String,
                         numFeatures: Int = -1): (RDD[(Double, SparseVector[Double])], Int) = {
     val sc = SparkContext.getOrCreate()
-    val dataSet = sc.textFile(path, sc.defaultMinPartitions )
+    val dataSet = sc.textFile(path, sc.defaultMinPartitions)
     toLibSVMDataSet(dataSet, numFeatures)
   }
 
@@ -31,7 +31,7 @@ object LoadDSUtil {
     * This method parses each line into a [[org.apache.spark.mllib.regression.LabeledPoint]],
     * where the feature indices are converted to zero-based.
     *
-    * @param dataSet 数据集
+    * @param dataSet     数据集
     * @param numFeatures number of features, which will be determined from the input data if a
     *                    nonpositive value is given. This is useful when the dataset is already split
     *                    into multiple files and you want to load them separately, because some
@@ -40,7 +40,7 @@ object LoadDSUtil {
     * @return labeled data stored as an RDD[LabeledPoint]
     */
   def toLibSVMDataSet(dataSet: RDD[String],
-                        numFeatures: Int = -1): (RDD[(Double, SparseVector[Double])], Int) = {
+                      numFeatures: Int = -1): (RDD[(Double, SparseVector[Double])], Int) = {
     val parsed = dataSet.map(_.trim)
       .filter(line => !(line.isEmpty || line.startsWith("#")))
       .map { line =>
@@ -52,7 +52,7 @@ object LoadDSUtil {
         val value = indexAndValue(1).toDouble
           (index, value)
         }.unzip
-        (label, indices.toArray, values.toArray)
+        (label, indices, values)
       }
 
     // Determine number of features.

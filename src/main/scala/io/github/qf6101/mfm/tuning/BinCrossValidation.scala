@@ -2,7 +2,6 @@ package io.github.qf6101.mfm.tuning
 
 import breeze.linalg.SparseVector
 import io.github.qf6101.mfm.baseframe.binomial.{BinLearner, BinModel}
-import io.github.qf6101.mfm.baseframe.{MLLearner, MLModel}
 import io.github.qf6101.mfm.util.{Logging, ParamUtil}
 import org.apache.spark.ml.param.{Param, ParamMap}
 import org.apache.spark.mllib.util.MLUtils
@@ -16,6 +15,14 @@ import scala.util.Random
   * Usage: 快速模型选择，固定其他参数，尝试某一参数的各个值，取最大AUC的参数值
   */
 
+/**
+  * 二分类交叉检验
+  *
+  * @param learner          二分类学习器
+  * @param paramGridBuilder 候选参数构造器
+  * @param numFolds         交叉份数
+  * @param baseParamMinAUC  基准AUC
+  */
 class BinCrossValidation(val learner: BinLearner,
                          val paramGridBuilder: BinParamGridBuilder,
                          val numFolds: Int = 5,
@@ -80,7 +87,7 @@ class BinCrossValidation(val learner: BinLearner,
   /**
     * 随机选择一组参数作为基准参数
     *
-    * @param dataset 数据集
+    * @param dataset         数据集
     * @param baseParamMinAUC 基准参数的AUC阈值（基准参数描述的模型AUC不能小于等于该阈值）
     * @return 基准参数
     */

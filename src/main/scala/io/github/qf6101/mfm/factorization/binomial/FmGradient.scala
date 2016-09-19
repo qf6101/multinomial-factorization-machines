@@ -9,14 +9,21 @@ import org.apache.spark.ml.param.ParamMap
 /**
   * Created by qfeng on 15-3-11.
   */
+
+/**
+  * FM梯度
+  *
+  * @param paramMeta 参数元数据
+  * @param params    参数池(保存参数值)
+  */
 class FmGradient(paramMeta: FmModelParam, params: ParamMap) extends Gradient with Logging {
   /**
     * Compute the gradient and loss given the features of a single data point,
     * add the gradient to a provided vector to avoid creating new objects, and return loss.
     *
-    * @param data features for one data point
-    * @param label label for this data point
-    * @param coeffs weights/coefficients corresponding to features
+    * @param data        features for one data point
+    * @param label       label for this data point
+    * @param coeffs      weights/coefficients corresponding to features
     * @param cumGradient the computed gradient will be added to this vector
     * @return loss
     */
@@ -65,5 +72,4 @@ class FmGradient(paramMeta: FmModelParam, params: ParamMap) extends Gradient wit
     }
     loss
   }
-
 }

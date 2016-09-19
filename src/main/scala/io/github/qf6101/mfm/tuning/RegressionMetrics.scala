@@ -6,7 +6,12 @@ import org.apache.spark.rdd.RDD
 /**
   * User: qfeng
   * Date: 15-8-11 下午4:03
-  * Usage:
+  */
+
+/**
+  * 回归模型指标
+  *
+  * @param scoreAndLabels 预测值和实际值
   */
 class RegressionMetrics(val scoreAndLabels: RDD[(Double, Double)]) {
   private val rm = new RM(scoreAndLabels)

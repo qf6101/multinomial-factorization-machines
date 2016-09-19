@@ -39,6 +39,9 @@ trait ModelParam extends Serializable {
   }
 }
 
+/**
+  * 静态模型参数对象
+  */
 object ModelParam {
   val namingParamType = "param_type"
 }

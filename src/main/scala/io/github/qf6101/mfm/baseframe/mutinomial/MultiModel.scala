@@ -9,6 +9,14 @@ import org.apache.spark.rdd.RDD
 /**
   * Created by qfeng on 16-9-9.
   */
+
+/**
+  * 多分类模型基类
+  *
+  * @param paramMeta 模型参赛
+  * @param coeffs    模型系数
+  * @param params    参数池（保存参数的值）
+  */
 abstract class MultiModel(override val paramMeta: MultiModelParam,
                           override val coeffs: Coefficients,
                           override val params: ParamMap)

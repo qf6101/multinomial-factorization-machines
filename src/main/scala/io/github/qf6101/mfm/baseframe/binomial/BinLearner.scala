@@ -10,14 +10,16 @@ import org.apache.spark.rdd.RDD
   */
 
 /**
-  * 模型学习器基类
+  * 二分学习器基类
+  *
   * @param params 参数池
   */
 abstract class BinLearner(override val params: ParamMap) extends MLLearner(params) {
   /**
-    * 训练对应模型
+    * 训练二分模型
+    *
     * @param dataset 训练集
-    * @return 模型
+    * @return 二分模型
     */
   def train(dataset: RDD[(Double, SparseVector[Double])]): BinModel
 }
