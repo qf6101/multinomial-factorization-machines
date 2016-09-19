@@ -11,7 +11,7 @@ This implementation is based on Spark 2.0.0 as compared with the famous standalo
 FM is designed for binary-class classification problem as the standard [libfm](http://www.libfm.org/). Please refer to [src/test/scala/io/github/qf6101/mfm/factorization/binomial/FmSuite.scala](src/test/scala/io/github/qf6101/mfm/factorization/binomial/FmSuite.scala
 ) for detailed usage.
 
-> Note: The implementation takes the label as +1/-1.
+> Note: The implementation takes the labels as +1/-1.
 
 ## Mutinomial Factorization Machines (MFM)
 
@@ -19,4 +19,4 @@ MFM is desinged for multi-class classification problem which uses softmax as hyp
 ](src/test/scala/io/github/qf6101/mfm/factorization/multinomial/MfmSuite.scala
 ) for detailed usage.
 
-> Note: The implementation takes the label as 0, 1, 2, etc.
+> Note: The implementation takes the labels as 0, 1, 2, etc.
