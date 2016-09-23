@@ -39,7 +39,7 @@ class FmGradient(paramMeta: FmModelParam, params: ParamMap) extends Gradient wit
     val loss = math.log(expComponent)
     val multiplier = -label * (1 - 1 / expComponent)
     //参与2阶项的最大维度
-    val maxInteractAttr = params(paramMeta.maxInteractFeatures)
+    val maxInteractFeatures = params(paramMeta.maxInteractFeatures)
     //0阶梯度
     if (params(paramMeta.k0)) {
       fmCumGradient.w0 += multiplier
@@ -55,13 +55,13 @@ class FmGradient(paramMeta: FmModelParam, params: ParamMap) extends Gradient wit
       for (factorIndex <- 0 until params(paramMeta.numFactors)) {
         //提前计算（因为求和中每一项都会用到）firstMoment = \sum_j^n {v_jf*x_j} （固定f）
         val firstMoment = data.activeIterator.foldLeft(0.0) { case (sum, (index, value)) =>
-          if (index < maxInteractAttr) {
+          if (index < maxInteractFeatures) {
             sum + fmcoeffs.v(index, factorIndex) * value
           } else sum
         }
         //计算2阶梯度
         data.activeIterator.foreach { case (index, value) =>
-          if (index < maxInteractAttr) {
+          if (index < maxInteractFeatures) {
             val twoWayCumCoeff = fmCumGradient.v(index, factorIndex)
             val twoWayCoeff = fmcoeffs.v(index, factorIndex)
             val incrementGradient = twoWayCumCoeff + multiplier * ((value * firstMoment) - (twoWayCoeff * value * value))
