@@ -1,11 +1,13 @@
 package io.github.qf6101.mfm.factorization.binomial
 
+import better.files.File
 import io.github.qf6101.mfm.baseframe.ModelParam
 import io.github.qf6101.mfm.baseframe.binomial.BinModelParam
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 import org.apache.spark.sql.SparkSession
-import org.json4s.JsonAST
+import org.json4s.{DefaultFormats, JsonAST}
 import org.json4s.JsonDSL._
+import org.json4s.jackson.JsonMethods._
 
 /**
   * Created by qfeng on 15-1-26.
@@ -71,6 +73,48 @@ object FmModelParam {
     val initMean = paramValues.getAs[Double](fmModelParam.initMean.name)
     val initStdev = paramValues.getAs[Double](fmModelParam.initStdev.name)
     val maxInteractFeatures = paramValues.getAs[Long](fmModelParam.maxInteractFeatures.name).toInt
+    // 设置参数值
+    params.put(fmModelParam.binaryThreshold, binaryThreshold)
+    params.put(fmModelParam.reg0, reg0)
+    params.put(fmModelParam.reg1, reg1)
+    params.put(fmModelParam.reg2, reg2)
+    params.put(fmModelParam.numFeatures, numFeatures)
+    params.put(fmModelParam.numFactors, numFactors)
+    params.put(fmModelParam.k0, k0)
+    params.put(fmModelParam.k1, k1)
+    params.put(fmModelParam.k2, k2)
+    params.put(fmModelParam.initMean, initMean)
+    params.put(fmModelParam.initStdev, initStdev)
+    params.put(fmModelParam.maxInteractFeatures, maxInteractFeatures)
+    // 返回FM参数
+    fmModelParam
+  }
+
+  /**
+    * 从本地文件载入参数
+    *
+    * @param location 本地文件位置
+    * @param params 参数池
+    * @return 分解机参数
+    */
+  def fromLocal(location: String, params: ParamMap): FmModelParam = {
+    // 初始化参数对象
+    val fmModelParam = new FmModelParam {}
+    implicit val formats = DefaultFormats
+    // 读取参数值
+    val paramValues = parse(File(location).contentAsString)
+    val binaryThreshold = (paramValues \ fmModelParam.binaryThreshold.name).extract[Double]
+    val reg0 = (paramValues \ fmModelParam.reg0.name).extract[Double]
+    val reg1 = (paramValues \ fmModelParam.reg1.name).extract[Double]
+    val reg2 = (paramValues \ fmModelParam.reg2.name).extract[Double]
+    val numFeatures = (paramValues \ fmModelParam.numFeatures.name).extract[Int]
+    val numFactors = (paramValues \ fmModelParam.numFactors.name).extract[Int]
+    val k0 = (paramValues \ fmModelParam.k0.name).extract[Boolean]
+    val k1 = (paramValues \ fmModelParam.k1.name).extract[Boolean]
+    val k2 = (paramValues \ fmModelParam.k2.name).extract[Boolean]
+    val initMean = (paramValues \ fmModelParam.initMean.name).extract[Double]
+    val initStdev = (paramValues \ fmModelParam.initStdev.name).extract[Double]
+    val maxInteractFeatures = (paramValues \ fmModelParam.maxInteractFeatures.name).extract[Int]
     // 设置参数值
     params.put(fmModelParam.binaryThreshold, binaryThreshold)
     params.put(fmModelParam.reg0, reg0)

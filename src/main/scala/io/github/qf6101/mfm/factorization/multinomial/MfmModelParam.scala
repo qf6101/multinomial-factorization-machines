@@ -1,5 +1,6 @@
 package io.github.qf6101.mfm.factorization.multinomial
 
+import better.files.File
 import io.github.qf6101.mfm.baseframe.ModelParam
 import io.github.qf6101.mfm.baseframe.mutinomial.MultiModelParam
 import io.github.qf6101.mfm.factorization.binomial.FmModelParam
@@ -7,7 +8,8 @@ import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 import org.apache.spark.sql.SparkSession
 import org.json4s.JsonAST.JField
 import org.json4s.JsonDSL._
-import org.json4s.{JObject, JsonAST}
+import org.json4s.jackson.JsonMethods._
+import org.json4s.{DefaultFormats, JObject, JsonAST}
 
 
 /**
@@ -78,6 +80,50 @@ object MfmModelParam {
     params.put(mfmModelParam.maxInteractFeatures, maxInteractFeatures)
     params.put(mfmModelParam.numClasses, numClasses)
     // 返回MFM参数
+    mfmModelParam
+  }
+
+  /**
+    * 从本地文件载入参数
+    *
+    * @param location 本地文件位置
+    * @param params 参数池
+    * @return 分解机参数
+    */
+  def fromLocal(location: String, params: ParamMap): MfmModelParam = {
+    // 初始化参数对象
+    val mfmModelParam = new MfmModelParam {}
+    implicit val formats = DefaultFormats
+    // 读取参数值
+    val paramValues = parse(File(location).contentAsString)
+    val binaryThreshold = (paramValues \ mfmModelParam.binaryThreshold.name).extract[Double]
+    val reg0 = (paramValues \ mfmModelParam.reg0.name).extract[Double]
+    val reg1 = (paramValues \ mfmModelParam.reg1.name).extract[Double]
+    val reg2 = (paramValues \ mfmModelParam.reg2.name).extract[Double]
+    val numFeatures = (paramValues \ mfmModelParam.numFeatures.name).extract[Int]
+    val numFactors = (paramValues \ mfmModelParam.numFactors.name).extract[Int]
+    val k0 = (paramValues \ mfmModelParam.k0.name).extract[Boolean]
+    val k1 = (paramValues \ mfmModelParam.k1.name).extract[Boolean]
+    val k2 = (paramValues \ mfmModelParam.k2.name).extract[Boolean]
+    val initMean = (paramValues \ mfmModelParam.initMean.name).extract[Double]
+    val initStdev = (paramValues \ mfmModelParam.initStdev.name).extract[Double]
+    val maxInteractFeatures = (paramValues \ mfmModelParam.maxInteractFeatures.name).extract[Int]
+    val numClasses = (paramValues \ mfmModelParam.numClasses.name).extract[Int]
+    // 设置参数值
+    params.put(mfmModelParam.binaryThreshold, binaryThreshold)
+    params.put(mfmModelParam.reg0, reg0)
+    params.put(mfmModelParam.reg1, reg1)
+    params.put(mfmModelParam.reg2, reg2)
+    params.put(mfmModelParam.numFeatures, numFeatures)
+    params.put(mfmModelParam.numFactors, numFactors)
+    params.put(mfmModelParam.k0, k0)
+    params.put(mfmModelParam.k1, k1)
+    params.put(mfmModelParam.k2, k2)
+    params.put(mfmModelParam.initMean, initMean)
+    params.put(mfmModelParam.initStdev, initStdev)
+    params.put(mfmModelParam.maxInteractFeatures, maxInteractFeatures)
+    params.put(mfmModelParam.numClasses, numClasses)
+    // 返回FM参数
     mfmModelParam
   }
 }

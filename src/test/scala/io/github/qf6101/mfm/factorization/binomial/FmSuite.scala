@@ -45,16 +45,30 @@ class FmSuite extends FunSuite with MfmTestSparkSession {
     // Save model to file
     HDFSUtil.deleteIfExists("test_data/output/a1a")
     model.save("test_data/output/a1a")
+
+    //// Firstly test spark reloading
     // Reload model from file and test if it is equal to the original model
-    val reloadModel = FmModel("test_data/output/a1a")
-    assert(model.equals(reloadModel))
+    val sparkReloadModel = FmModel("test_data/output/a1a")
+    assert(model.equals(sparkReloadModel))
     // Evaluate the reloaded model
-    val reloadEval = testing.map { case (label, features) =>
-      (model.predict(features), label)
+    val sparkReloadEval = testing.map { case (label, features) =>
+      (sparkReloadModel.predict(features), label)
     }
     // Test if the reloaded model has the same result on the testing data set
-    val reloadMetrics = new BinaryClassificationMetrics(reloadEval)
-    assert(reloadMetrics.AUC ~= metrics.AUC absTol 1E-5)
+    val sparkReloadMetrics = new BinaryClassificationMetrics(sparkReloadEval)
+    assert(sparkReloadMetrics.AUC ~= metrics.AUC absTol 1E-5)
+
+    //// Secondly test local reloading
+    // Reload model from file and test if it is equal to the original model
+    val localReloadModel = FmModel.fromLocal("test_data/output/a1a")
+    assert(model.equals(localReloadModel))
+    // Evaluate the reloaded model
+    val localReloadEval = testing.map { case (label, features) =>
+      (localReloadModel.predict(features), label)
+    }
+    // Test if the reloaded model has the same result on the testing data set
+    val localReloadMetrics = new BinaryClassificationMetrics(localReloadEval)
+    assert(localReloadMetrics.AUC ~= metrics.AUC absTol 1E-5)
     // print the AUC
     println("AUC: " + metrics.AUC)
   }
