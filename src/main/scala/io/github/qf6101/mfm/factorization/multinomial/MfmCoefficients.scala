@@ -1,8 +1,10 @@
 package io.github.qf6101.mfm.factorization.multinomial
 
+import better.files.File
 import io.github.qf6101.mfm.baseframe.Coefficients
 import io.github.qf6101.mfm.factorization.binomial.FmCoefficients
 import org.apache.spark.sql.SparkSession
+import org.json4s.DefaultFormats
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
@@ -254,12 +256,32 @@ object MfmCoefficients {
     // 初始化spark session
     val spark = SparkSession.builder().getOrCreate()
     // 读取元数据
-    val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile).first()
+    val meta = spark.read.json(location + "/" + Coefficients.namingMetaFile + "/part-00000").first()
     val numClasses = meta.getAs[Long](namingNumClasses).toInt
     // 读取系数
     val thetas = Array.fill[FmCoefficients](numClasses)(null)
     for (index <- 0 until numClasses) {
       thetas(index) = FmCoefficients(location + "/" + Coefficients.namingDataFile + "/" + index)
+    }
+    // 返回结果
+    new MfmCoefficients(thetas)
+  }
+
+  /**
+    * 从本地文件载入系数
+    *
+    * @param location 本地文件
+    * @return MFM系数对象
+    */
+  def fromLocal(location: String): MfmCoefficients = {
+    //读取元数据
+    implicit val formats = DefaultFormats
+    val meta = parse(File(location + "/" + Coefficients.namingMetaFile + "/part-00000").contentAsString)
+    val numClasses = (meta \ namingNumClasses).extract[Int]
+    // 读取系数
+    val thetas = Array.fill[FmCoefficients](numClasses)(null)
+    for (index <- 0 until numClasses) {
+      thetas(index) = FmCoefficients.fromLocal(location + "/" + Coefficients.namingDataFile + "/" + index)
     }
     // 返回结果
     new MfmCoefficients(thetas)

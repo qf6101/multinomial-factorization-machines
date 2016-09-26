@@ -1,12 +1,18 @@
 package io.github.qf6101.mfm.factorization.binomial
 
+import better.files.File
 import breeze.linalg.{DenseMatrix, DenseVector}
 import io.github.qf6101.mfm.baseframe.Coefficients
 import io.github.qf6101.mfm.util.GaussianRandom
+import org.apache.hadoop.fs.Path
+import org.apache.parquet.hadoop.ParquetReader
+import org.apache.parquet.tools.read.{SimpleReadSupport, SimpleRecord}
 import org.apache.spark.sql.SparkSession
+import org.json4s.DefaultFormats
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
+import scala.collection.mutable.ListBuffer
 import scala.math._
 
 /**
@@ -341,5 +347,46 @@ object FmCoefficients {
       }.collect())
     //返回结果
     new FmCoefficients(w0, w, v, k0, k1, k2)
+  }
+
+  /**
+    * 从本地文件载入系数
+    *
+    * @param location 本地文件
+    * @return FM系数对象
+    */
+  def fromLocal(location: String): FmCoefficients = {
+    //读取元数据
+    implicit val formats = DefaultFormats
+    val meta = parse(File(location + "/" + Coefficients.namingMetaFile + "/part-00000").contentAsString)
+    val w0 = (meta \ namingIntercept).extract[Double]
+    val vRows = (meta \ namingVRows).extract[Int]
+    val vCols = (meta \ namingVCols).extract[Int]
+    val k0 = (meta \ namingK0).extract[Boolean]
+    val k1 = (meta \ namingK1).extract[Boolean]
+    val k2 = (meta \ namingK2).extract[Boolean]
+    // 读取w和v向量
+    val w = DenseVector(readValues(location + "/" + Coefficients.namingDataFile + "/w"))
+    val v = DenseMatrix.create(vRows, vCols, readValues(location + "/" + Coefficients.namingDataFile + "/v"))
+    //返回结果
+    new FmCoefficients(w0, w, v, k0, k1, k2)
+  }
+
+  /**
+    * 从本地文件读取系数内容
+    *
+    * @param location 本地文件
+    * @return 系数对象
+    */
+  def readValues(location: String): Array[Double] = {
+    val reader = ParquetReader.builder[SimpleRecord](new SimpleReadSupport(), new Path(location)).build()
+    val values = ListBuffer[Double]()
+    var elem = reader.read()
+    while (elem != null) {
+      values += elem.getValues.get(0).getValue.asInstanceOf[Double]
+      elem = reader.read()
+    }
+    reader.close()
+    values.toArray
   }
 }

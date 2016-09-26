@@ -1,5 +1,11 @@
 package io.github.qf6101.mfm.baseframe
 
+import org.apache.hadoop.fs.Path
+import org.apache.parquet.hadoop.ParquetReader
+import org.apache.parquet.tools.read.{SimpleReadSupport, SimpleRecord}
+
+import scala.collection.mutable.ListBuffer
+
 /**
   * Created by qfeng on 15-3-12.
   */

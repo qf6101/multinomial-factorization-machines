@@ -2,6 +2,7 @@ package io.github.qf6101.mfm.util
 
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.SparkContext
+import org.apache.spark.sql.SparkSession
 
 /**
   * Created by qfeng on 16-3-3.
@@ -17,8 +18,8 @@ object HDFSUtil {
     * @param file 文件
     */
   def deleteIfExists(file: String): Unit = {
-    val sc = SparkContext.getOrCreate()
-    val fs = FileSystem.get(sc.hadoopConfiguration)
+    val spark = SparkSession.builder().getOrCreate()
+    val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
     if (fs.exists(new Path(file))) {
       fs.delete(new Path(file), true)
     }

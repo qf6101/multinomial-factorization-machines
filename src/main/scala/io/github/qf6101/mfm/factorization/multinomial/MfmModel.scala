@@ -93,4 +93,17 @@ object MfmModel {
     val coefficients = MfmCoefficients(location + "/" + MLModel.namingCoeffFile)
     new MfmModel(paramMeta, coefficients, params)
   }
+
+  /**
+    * 从本地文件载入分解机模型
+    *
+    * @param location 包含分解机型信息的本地文件
+    * @return 分解机模型
+    */
+  def fromLocal(location: String): MfmModel = {
+    val params = new ParamMap()
+    val paramMeta = MfmModelParam.fromLocal(location + "/" + MLModel.namingParamFile + "/part-00000", params)
+    val coefficients = MfmCoefficients.fromLocal(location + "/" + MLModel.namingCoeffFile)
+    new MfmModel(paramMeta, coefficients, params)
+  }
 }

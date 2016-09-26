@@ -27,9 +27,9 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     params.put(mfmLearn.gd.convergenceTol, 1E-5)
     params.put(mfmLearn.numFeatures, numFeatures)
     params.put(mfmLearn.numFactors, 5)
-    params.put(mfmLearn.k0, false)
+    params.put(mfmLearn.k0, true)
     params.put(mfmLearn.k1, true)
-    params.put(mfmLearn.k2, false)
+    params.put(mfmLearn.k2, true)
     params.put(mfmLearn.maxInteractFeatures, numFeatures)
     params.put(mfmLearn.initMean, 0.0)
     params.put(mfmLearn.initStdev, 0.01)
@@ -47,19 +47,37 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     // Save model to file
     HDFSUtil.deleteIfExists("test_data/output/mnist")
     model.save("test_data/output/mnist")
+
+    //// Firstly test spark reloading
     // Reload model from file and test if it is equal to the original model
-    val reloadModel = MfmModel("test_data/output/mnist")
-    assert(model.equals(reloadModel))
+    val sparkReloadModel = MfmModel("test_data/output/mnist")
+    assert(model.equals(sparkReloadModel))
     // Evaluate the reloaded model
-    val reloadEval = testing.map { case (label, features) =>
-      argmax(reloadModel.predict(features)).toDouble -> label
+    val sparkReloadEval = testing.map { case (label, features) =>
+      argmax(sparkReloadModel.predict(features)).toDouble -> label
     }
     // Test if the reloaded model has the same result on the testing data set
-    val reloadMetrics = new MulticlassMetrics(reloadEval)
-    assert(reloadMetrics.accuracy ~= metrics.accuracy absTol 1E-5)
-    assert(reloadMetrics.weightedPrecision ~= metrics.weightedPrecision absTol 1E-5)
-    assert(reloadMetrics.weightedRecall ~= metrics.weightedRecall absTol 1E-5)
-    assert(reloadMetrics.weightedFMeasure ~= metrics.weightedFMeasure absTol 1E-5)
+    val sparkReloadMetrics = new MulticlassMetrics(sparkReloadEval)
+    assert(sparkReloadMetrics.accuracy ~= metrics.accuracy absTol 1E-5)
+    assert(sparkReloadMetrics.weightedPrecision ~= metrics.weightedPrecision absTol 1E-5)
+    assert(sparkReloadMetrics.weightedRecall ~= metrics.weightedRecall absTol 1E-5)
+    assert(sparkReloadMetrics.weightedFMeasure ~= metrics.weightedFMeasure absTol 1E-5)
+
+    //// Secondly test local reloading
+    // Reload model from file and test if it is equal to the original model
+    val localReloadModel = MfmModel.fromLocal("test_data/output/mnist")
+    assert(model.equals(localReloadModel))
+    // Evaluate the reloaded model
+    val localReloadEval = testing.map { case (label, features) =>
+      argmax(localReloadModel.predict(features)).toDouble -> label
+    }
+    // Test if the reloaded model has the same result on the testing data set
+    val localReloadMetrics = new MulticlassMetrics(localReloadEval)
+    assert(localReloadMetrics.accuracy ~= metrics.accuracy absTol 1E-5)
+    assert(localReloadMetrics.weightedPrecision ~= metrics.weightedPrecision absTol 1E-5)
+    assert(localReloadMetrics.weightedRecall ~= metrics.weightedRecall absTol 1E-5)
+    assert(localReloadMetrics.weightedFMeasure ~= metrics.weightedFMeasure absTol 1E-5)
+
     // print the metrics
     println("accuracy: " + metrics.accuracy)
     println("weighted precision: " + metrics.weightedPrecision)

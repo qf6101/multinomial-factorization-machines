@@ -108,4 +108,17 @@ object FmModel extends Logging {
     val coefficients = FmCoefficients(location + "/" + MLModel.namingCoeffFile)
     new FmModel(paramMeta, coefficients, params)
   }
+
+  /**
+    * 从本地文件载入分解机模型
+    *
+    * @param location 包含分解机型信息的本地文件
+    * @return 分解机模型
+    */
+  def fromLocal(location: String): FmModel = {
+    val params = new ParamMap()
+    val paramMeta = FmModelParam.fromLocal(location + "/" + MLModel.namingParamFile + "/part-00000", params)
+    val coefficients = FmCoefficients.fromLocal(location + "/" + MLModel.namingCoeffFile)
+    new FmModel(paramMeta, coefficients, params)
+  }
 }
