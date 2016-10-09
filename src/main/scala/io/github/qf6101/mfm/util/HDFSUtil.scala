@@ -24,4 +24,15 @@ object HDFSUtil {
       fs.delete(new Path(file), true)
     }
   }
+
+  /**
+    * 文件是否存在
+    *
+    * @param file 文件
+    */
+  def exists(file: String): Boolean = {
+    val spark = SparkSession.builder().getOrCreate()
+    val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
+    fs.exists(new Path(file))
+  }
 }

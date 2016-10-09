@@ -27,9 +27,9 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     params.put(mfmLearn.gd.convergenceTol, 1E-5)
     params.put(mfmLearn.numFeatures, numFeatures)
     params.put(mfmLearn.numFactors, 5)
-    params.put(mfmLearn.k0, true)
+    params.put(mfmLearn.k0, false)
     params.put(mfmLearn.k1, true)
-    params.put(mfmLearn.k2, true)
+    params.put(mfmLearn.k2, false)
     params.put(mfmLearn.maxInteractFeatures, numFeatures)
     params.put(mfmLearn.initMean, 0.0)
     params.put(mfmLearn.initStdev, 0.01)
@@ -77,7 +77,6 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     assert(localReloadMetrics.weightedPrecision ~= metrics.weightedPrecision absTol 1E-5)
     assert(localReloadMetrics.weightedRecall ~= metrics.weightedRecall absTol 1E-5)
     assert(localReloadMetrics.weightedFMeasure ~= metrics.weightedFMeasure absTol 1E-5)
-
     // print the metrics
     println("accuracy: " + metrics.accuracy)
     println("weighted precision: " + metrics.weightedPrecision)
