@@ -39,7 +39,7 @@ class FmCoefficients(val initMean: Double,
                      val k1: Boolean,
                      val k2: Boolean) extends Coefficients {
   var w0 = GaussianRandom.rand(initMean, initStdev)
-  var w = GaussianRandom.randDenseVector(initMean, initStdev, numFeatures)
+  var w = DenseVector.zeros[Double](numFeatures)
   var v = GaussianRandom.randDenseMatrix(initMean, initStdev, numInteractFeatures, numFactors)
 
   /**
