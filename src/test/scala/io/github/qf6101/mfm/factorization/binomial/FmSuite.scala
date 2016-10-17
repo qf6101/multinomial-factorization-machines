@@ -1,6 +1,6 @@
 package io.github.qf6101.mfm.factorization.binomial
 
-import io.github.qf6101.mfm.optimization.SquaredL2Updater
+import io.github.qf6101.mfm.optimization.{LogXDecreasingStrategy, SquaredL2Updater}
 import io.github.qf6101.mfm.tuning.BinaryClassificationMetrics
 import io.github.qf6101.mfm.util.TestingUtils._
 import io.github.qf6101.mfm.util.{HDFSUtil, LoadDSUtil, MfmTestSparkSession}
@@ -18,23 +18,23 @@ class FmSuite extends FunSuite with MfmTestSparkSession {
     val (testing, numFeatures) = LoadDSUtil.loadLibSVMDataSet("test_data/input/a1a/a1a.t")
     // Construct factorization machines learner with parameters
     val params = new ParamMap()
-    val updater = new SquaredL2Updater()
+    val updater = new SquaredL2Updater(decreasingStrategy = new LogXDecreasingStrategy(100))
     val fmLearn = new FmLearnSGD(params, updater)
-    params.put(fmLearn.gd.numIterations, 10)
-    params.put(fmLearn.gd.stepSize, 1.0)
+    params.put(fmLearn.gd.numIterations, 100)
+    params.put(fmLearn.gd.stepSize, 0.1)
     params.put(fmLearn.gd.miniBatchFraction, 1.0)
     params.put(fmLearn.gd.convergenceTol, 1E-5)
     params.put(fmLearn.numFeatures, numFeatures)
     params.put(fmLearn.numFactors, 5)
-    params.put(fmLearn.k0, true)
+    params.put(fmLearn.k0, false)
     params.put(fmLearn.k1, true)
-    params.put(fmLearn.k2, true)
+    params.put(fmLearn.k2, false)
     params.put(fmLearn.maxInteractFeatures, numFeatures)
     params.put(fmLearn.initMean, 0.0)
     params.put(fmLearn.initStdev, 0.0001)
-    params.put(fmLearn.reg0, 0.0001)
-    params.put(fmLearn.reg1, 0.0001)
-    params.put(fmLearn.reg2, 0.001)
+    params.put(fmLearn.reg0, 0.0)
+    params.put(fmLearn.reg1, 0.0)
+    params.put(fmLearn.reg2, 0.0)
     // Train FM model
     val model = fmLearn.train(training)
     // Use testing data set to evaluate the model

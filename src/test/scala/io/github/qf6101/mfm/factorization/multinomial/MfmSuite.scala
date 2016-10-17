@@ -1,7 +1,7 @@
 package io.github.qf6101.mfm.factorization.multinomial
 
 import breeze.linalg.argmax
-import io.github.qf6101.mfm.optimization.SquaredL2Updater
+import io.github.qf6101.mfm.optimization._
 import io.github.qf6101.mfm.util.TestingUtils._
 import io.github.qf6101.mfm.util.{HDFSUtil, LoadDSUtil, MfmTestSparkSession}
 import org.apache.spark.ml.param.ParamMap
@@ -19,10 +19,10 @@ class MfmSuite extends FunSuite with MfmTestSparkSession {
     val (testing, _) = LoadDSUtil.loadLibSVMDataSet("test_data/input/mnist/mnist.scale.t")
     // Construct multinomial factorization machines learner with parameters
     val params = new ParamMap()
-    val updater = new SquaredL2Updater()
+    val updater = new SquaredL2Updater(decreasingStrategy = new LogXDecreasingStrategy(20))
     val mfmLearn = new MfmLearnSGD(params, updater)
-    params.put(mfmLearn.gd.numIterations, 50)
-    params.put(mfmLearn.gd.stepSize, 1.0)
+    params.put(mfmLearn.gd.numIterations, 10)
+    params.put(mfmLearn.gd.stepSize, 0.1)
     params.put(mfmLearn.gd.miniBatchFraction, 1.0)
     params.put(mfmLearn.gd.convergenceTol, 1E-5)
     params.put(mfmLearn.numFeatures, numFeatures)

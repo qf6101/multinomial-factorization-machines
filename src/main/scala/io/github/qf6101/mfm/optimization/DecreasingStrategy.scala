@@ -24,7 +24,32 @@ class Log10DecreasingStrategy extends DecreasingStrategy {
     * @return 学习步长衰减的分母
     */
   def decrease(iter: Int): Double = {
-    Math.log10(9 + iter)
+    math.log10(9 + iter)
+  }
+}
+
+class LogXDecreasingStrategy(X: Int) extends DecreasingStrategy {
+  /**
+    * 根据当前的迭代次数计算学习步长衰减的分母
+    * 按照logX进行衰减
+    *
+    * @param iter 迭代次数
+    * @return 学习步长衰减的分母
+    */
+  def decrease(iter: Int): Double = {
+    math.log(X - 1 + iter) / math.log(X)
+  }
+}
+
+class ConstantDecreasingStrategy(stepSize: Double) extends DecreasingStrategy {
+  /**
+    * 不衰减
+    *
+    * @param iter 迭代次数
+    * @return 常数学习率(不衰减学习率)
+    */
+  def decrease(iter: Int): Double = {
+    stepSize
   }
 }
 
@@ -40,3 +65,4 @@ class sqrtDecreasingStrategy extends DecreasingStrategy {
     Math.sqrt(iter)
   }
 }
+

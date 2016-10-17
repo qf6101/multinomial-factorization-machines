@@ -32,7 +32,7 @@ abstract class Updater(private val decreasingStrategy: DecreasingStrategy)
   * A simple updater for gradient descent *without* any regularization.
   * Uses a step-size decreasing with the square root of the number of iterations.
   */
-class SimpleUpdater(private val decreasingStrategy: DecreasingStrategy = new sqrtDecreasingStrategy())
+class SimpleUpdater(private val decreasingStrategy: DecreasingStrategy = new Log10DecreasingStrategy())
   extends Updater(decreasingStrategy) {
   /**
     * Compute an updated value for weights given the gradient, stepSize, iteration number and
@@ -63,7 +63,7 @@ class SimpleUpdater(private val decreasingStrategy: DecreasingStrategy = new sqr
   * R(w) = 1/2 ||w||2
   * Uses a step-size decreasing with the square root of the number of iterations.
   **/
-class SquaredL2Updater(private val decreasingStrategy: DecreasingStrategy = new sqrtDecreasingStrategy())
+class SquaredL2Updater(private val decreasingStrategy: DecreasingStrategy = new Log10DecreasingStrategy())
   extends Updater(decreasingStrategy) {
   /**
     * Compute an updated value for weights given the gradient, stepSize, iteration number and
@@ -87,6 +87,7 @@ class SquaredL2Updater(private val decreasingStrategy: DecreasingStrategy = new 
     // the gradient of the regularizer (= regParam * weightsOld)
     // w' = w - thisIterStepSize * (gradient + regParam * w)
     val thisIterStepSize = stepSize / decreasingStrategy.decrease(iter)
+    logInfo("step size: " + thisIterStepSize)
     val coeffNew = coeffOld + ((gradient + coeffOld.L2RegGradient(regParam)) * (-thisIterStepSize))
     (coeffNew, coeffNew.L2RegValue(regParam))
   }
@@ -111,7 +112,7 @@ class SquaredL2Updater(private val decreasingStrategy: DecreasingStrategy = new 
   *
   * Equivalently, set weight component to signum(w) * max(0.0, abs(w) - shrinkageVal)
   */
-class L1Updater(private val decreasingStrategy: DecreasingStrategy = new sqrtDecreasingStrategy())
+class L1Updater(private val decreasingStrategy: DecreasingStrategy = new Log10DecreasingStrategy())
   extends Updater(decreasingStrategy) {
   /**
     * Compute an updated value for weights given the gradient, stepSize, iteration number and
